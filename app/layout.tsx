@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Archivo, Inter, Spline_Sans_Mono } from "next/font/google";
 import "./globals.css";
 import { Providers } from "./providers";
+import { ServiceWorkerRegister } from "@/components/ServiceWorkerRegister";
 
 const archivo = Archivo({ subsets: ["latin"], variable: "--font-display" });
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
@@ -30,6 +31,7 @@ export default function RootLayout({
     >
       <body className="min-h-[100dvh] font-sans antialiased">
         <Providers>{children}</Providers>
+        <ServiceWorkerRegister />
       </body>
     </html>
   );
