@@ -1,0 +1,36 @@
+{
+  "name": "gymapp",
+  "version": "0.1.0",
+  "private": true,
+  "engines": {
+    "node": ">=18.12.0"
+  },
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "db:types": "supabase gen types typescript --linked > lib/supabase/types.ts",
+    "db:seed:exercises": "tsx supabase/seed/seed-exercises.ts",
+    "db:seed:routines": "tsx supabase/seed/seed-routines.ts"
+  },
+  "dependencies": {
+    "@supabase/ssr": "0.5.2",
+    "@supabase/supabase-js": "2.45.4",
+    "@tanstack/react-query": "^5.59.0",
+    "next": "13.5.11",
+    "react": "18.2.0",
+    "react-dom": "18.2.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.0",
+    "@types/react": "^18.2.0",
+    "@types/react-dom": "^18.2.0",
+    "autoprefixer": "^10.4.20",
+    "eslint": "^8.57.0",
+    "eslint-config-next": "13.5.11",
+    "postcss": "^8.4.47",
+    "tailwindcss": "^3.4.13",
+    "typescript": "^5.5.4"
+  }
+}
