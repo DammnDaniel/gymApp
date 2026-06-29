@@ -141,7 +141,7 @@ export function DaySection({
               <DragOverlay>
                 {activeRe ? (
                   <div className="rounded-md bg-surface-2 p-3 text-sm font-semibold text-ink shadow-hero">
-                    {activeRe.exercise?.name ?? "Ejercicio"}
+                    {activeRe.exercise?.name_es ?? activeRe.exercise?.name ?? "Ejercicio"}
                   </div>
                 ) : null}
               </DragOverlay>,

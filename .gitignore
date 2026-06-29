@@ -36,3 +36,6 @@ next-env.d.ts
 # supabase
 /supabase/.temp
 /supabase/.branches
+
+# scripts temporales (traducción, etc.)
+/scripts-tmp

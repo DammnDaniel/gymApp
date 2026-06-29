@@ -76,7 +76,7 @@ export function SortableExerciseItem({
               href={href}
               className="line-clamp-2 text-sm font-semibold leading-snug text-ink"
             >
-              {re.exercise?.name ?? "Ejercicio"}
+              {re.exercise?.name_es ?? re.exercise?.name ?? "Ejercicio"}
             </Link>
             <div className="flex shrink-0 gap-2.5">
               <button

@@ -20,6 +20,7 @@ export type RoutineExerciseCatalog = {
   id: string;
   slug: string;
   name: string;
+  name_es: string | null;
   image_start: string | null;
   primary_muscles: string[];
 };
@@ -99,7 +100,7 @@ export function useRoutine(id: string) {
              routine_exercises (
                id, day_id, exercise_id, position,
                target_sets, target_reps_min, target_reps_max, notes,
-               exercise:exercises ( id, slug, name, image_start, primary_muscles )
+               exercise:exercises ( id, slug, name, name_es, image_start, primary_muscles )
              )
            )`,
         )

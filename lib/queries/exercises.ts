@@ -5,6 +5,7 @@ export type ExerciseListItem = {
   id: string;
   slug: string;
   name: string;
+  name_es: string | null;
   equipment: string | null;
   level: string | null;
   primary_muscles: string[];
@@ -26,12 +27,15 @@ export function useExercises(filters: ExerciseFilters) {
       let query = supabase
         .from("exercises")
         .select(
-          "id, slug, name, equipment, level, primary_muscles, image_start, image_end",
+          "id, slug, name, name_es, equipment, level, primary_muscles, image_start, image_end",
         )
         .order("name")
         .limit(150);
 
-      if (filters.q) query = query.ilike("name", `%${filters.q}%`);
+      if (filters.q)
+        query = query.or(
+          `name.ilike.%${filters.q}%,name_es.ilike.%${filters.q}%`,
+        );
       if (filters.muscle)
         query = query.contains("primary_muscles", [filters.muscle]);
       if (filters.equipment) query = query.eq("equipment", filters.equipment);

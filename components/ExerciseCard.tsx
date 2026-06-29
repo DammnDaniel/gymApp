@@ -22,7 +22,7 @@ export function ExerciseCard({ ex }: { ex: ExerciseListItem }) {
       </div>
       <div className="flex flex-col gap-1 p-3">
         <div className="line-clamp-2 text-[13px] font-semibold leading-snug text-ink">
-          {ex.name}
+          {ex.name_es ?? ex.name}
         </div>
         <div className="font-mono text-[10px] uppercase tracking-[0.1em] text-ink-mute">
           {meta}

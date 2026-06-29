@@ -23,6 +23,9 @@ export default async function ExerciseDetailPage({
     .join(" · ");
   const primary: string[] = ex.primary_muscles ?? [];
   const secondary: string[] = ex.secondary_muscles ?? [];
+  const title: string = ex.name_es ?? ex.name;
+  const instructions: string[] =
+    ex.instructions_es?.length ? ex.instructions_es : (ex.instructions ?? []);
 
   return (
     <article className="flex flex-col gap-6">
@@ -32,7 +35,7 @@ export default async function ExerciseDetailPage({
 
       <div>
         <h1 className="font-display text-[26px] font-extrabold leading-tight tracking-tightd text-ink">
-          {ex.name}
+          {title}
         </h1>
         {meta && (
           <p className="mt-1.5 font-mono text-[11px] uppercase tracking-[0.1em] text-ink-mute">
@@ -64,11 +67,11 @@ export default async function ExerciseDetailPage({
         </div>
       )}
 
-      {ex.instructions?.length > 0 && (
+      {instructions.length > 0 && (
         <section className="flex flex-col gap-3">
           <h2 className="kicker">// Instrucciones</h2>
           <ol className="flex flex-col gap-3">
-            {ex.instructions.map((step: string, i: number) => (
+            {instructions.map((step: string, i: number) => (
               <li key={i} className="flex gap-3">
                 <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-sm bg-surface-2 font-display text-sm font-extrabold tabular-nums text-accent">
                   {i + 1}
