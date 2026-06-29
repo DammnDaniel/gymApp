@@ -46,6 +46,17 @@ export default async function ExerciseDetailPage({
 
       <ExerciseGif start={ex.image_start} end={ex.image_end} alt={ex.name} />
 
+      <a
+        href={`https://www.youtube.com/results?search_query=${encodeURIComponent(
+          `${title} técnica`,
+        )}`}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="inline-flex h-11 items-center justify-center gap-2 rounded-md border border-border bg-surface-2 px-5 font-mono text-[12px] font-semibold uppercase tracking-[0.04em] text-ink transition hover:border-border-strong hover:bg-surface-3"
+      >
+        ▶ Ver técnica en YouTube
+      </a>
+
       {(primary.length > 0 || secondary.length > 0) && (
         <div className="flex flex-wrap gap-2">
           {primary.map((m) => (
