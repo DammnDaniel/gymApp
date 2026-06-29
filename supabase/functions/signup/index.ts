@@ -11,8 +11,14 @@ const json = (b: unknown, s = 200) =>
     headers: { ...cors, "Content-Type": "application/json" },
   });
 
+// ── REGISTRO CERRADO ────────────────────────────────────────────────
+// Los 2 perfiles ya están dados de alta. Para REABRIR el registro:
+// pon REGISTRATION_OPEN = true y vuelve a desplegar (npm run deploy o CLI).
+const REGISTRATION_OPEN = false;
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: cors });
+  if (!REGISTRATION_OPEN) return json({ error: "El registro está cerrado." }, 403);
   try {
     const { username, email, password } = await req.json();
     if (!username || !email || !password)
