@@ -11,8 +11,8 @@
     "start": "next start",
     "lint": "next lint",
     "db:types": "supabase gen types typescript --linked > lib/supabase/types.ts",
-    "db:seed:exercises": "tsx supabase/seed/seed-exercises.ts",
-    "db:seed:routines": "tsx supabase/seed/seed-routines.ts"
+    "db:seed:exercises": "node supabase/seed/seed-exercises.mjs",
+    "db:seed:routines": "node supabase/seed/seed-routines.mjs"
   },
   "dependencies": {
     "@supabase/ssr": "0.5.2",
