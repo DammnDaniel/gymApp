@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import {
@@ -101,15 +102,23 @@ export function DaySection({
             className="mt-0.5 w-full bg-transparent font-mono text-[11px] uppercase tracking-[0.1em] text-ink-mute outline-none placeholder:text-ink-faint"
           />
         </div>
-        <button
-          onClick={() => {
-            if (window.confirm("¿Borrar este día?"))
-              deleteDay.mutate({ routineId, dayId: day.id });
-          }}
-          className="shrink-0 font-mono text-[10px] uppercase tracking-[0.1em] text-ink-faint transition hover:text-danger"
-        >
-          Borrar
-        </button>
+        <div className="flex shrink-0 flex-col items-end gap-1.5">
+          <Link
+            href={`/workout/${day.id}`}
+            className="inline-flex h-8 items-center gap-1 rounded-sm bg-accent px-3 font-mono text-[11px] font-semibold uppercase tracking-[0.04em] text-accent-ink shadow-glow transition active:scale-[0.97]"
+          >
+            ▶ Entrenar
+          </Link>
+          <button
+            onClick={() => {
+              if (window.confirm("¿Borrar este día?"))
+                deleteDay.mutate({ routineId, dayId: day.id });
+            }}
+            className="font-mono text-[10px] uppercase tracking-[0.1em] text-ink-faint transition hover:text-danger"
+          >
+            Borrar
+          </button>
+        </div>
       </div>
 
       {day.routine_exercises.length === 0 ? (
