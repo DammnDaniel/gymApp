@@ -17,17 +17,17 @@ export default async function AppLayout({
 
   return (
     <div className="mx-auto flex min-h-[100dvh] w-full max-w-2xl flex-col">
-      <header className="sticky top-0 z-20 flex items-center justify-between border-b border-zinc-200/70 bg-white/80 px-5 py-3.5 backdrop-blur-lg dark:border-zinc-800/70 dark:bg-zinc-950/80">
-        <Link
-          href="/dashboard"
-          className="text-base font-semibold tracking-tight"
-        >
-          Gym<span className="text-lime-500">App</span>
+      <header className="sticky top-0 z-20 flex items-center justify-between border-b border-border bg-bg/80 px-5 py-3.5 backdrop-blur-xl">
+        <Link href="/dashboard" className="flex items-center">
+          <span className="font-display text-lg font-extrabold tracking-tightd">
+            <span className="text-ink">GYM</span>
+            <span className="text-accent">APP</span>
+          </span>
         </Link>
         <LogoutButton />
       </header>
 
-      <main className="flex-1 px-5 py-6 pb-28">{children}</main>
+      <main className="flex-1 px-5 py-6 pb-32">{children}</main>
 
       <BottomNav />
     </div>

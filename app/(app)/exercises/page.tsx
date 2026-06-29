@@ -25,10 +25,15 @@ export default function ExercisesPage() {
   return (
     <div className="flex flex-col gap-5">
       <div>
-        <h1 className="text-2xl font-semibold tracking-tight">Biblioteca</h1>
-        <p className="text-sm text-zinc-500">
-          {data ? `${data.length} ejercicios` : "Catálogo de ejercicios"}
-        </p>
+        <p className="kicker">// Biblioteca</p>
+        <div className="mt-1 flex items-baseline gap-2">
+          <span className="font-display text-stat font-extrabold tabular-nums text-ink">
+            {data ? data.length : "—"}
+          </span>
+          <span className="font-mono text-[11px] uppercase tracking-kicker text-ink-mute">
+            ejercicios
+          </span>
+        </div>
       </div>
 
       <ExerciseFilters
@@ -41,7 +46,7 @@ export default function ExercisesPage() {
       />
 
       {error && (
-        <p className="text-sm text-red-600 dark:text-red-400">
+        <p className="text-sm text-danger">
           No se pudieron cargar los ejercicios.
         </p>
       )}
@@ -51,7 +56,7 @@ export default function ExercisesPage() {
           {Array.from({ length: 9 }).map((_, i) => (
             <div
               key={i}
-              className="aspect-[3/4] animate-pulse rounded-2xl bg-zinc-100 dark:bg-zinc-900"
+              className="aspect-[3/4] animate-pulse rounded-lg bg-surface-3"
             />
           ))}
         </div>
@@ -62,8 +67,8 @@ export default function ExercisesPage() {
           ))}
         </div>
       ) : (
-        <p className="py-10 text-center text-sm text-zinc-500">
-          Sin resultados. Prueba otra búsqueda.
+        <p className="py-12 text-center font-mono text-[11px] uppercase tracking-kicker text-ink-faint">
+          Sin resultados
         </p>
       )}
     </div>

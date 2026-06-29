@@ -14,25 +14,20 @@ export function BottomNav() {
   const pathname = usePathname();
 
   return (
-    <nav className="fixed inset-x-0 bottom-0 z-20 mx-auto max-w-2xl border-t border-zinc-200/70 bg-white/85 backdrop-blur-lg dark:border-zinc-800/70 dark:bg-zinc-950/85">
-      <div className="grid grid-cols-4 pb-[env(safe-area-inset-bottom)]">
+    <nav className="fixed inset-x-3 bottom-[calc(12px+env(safe-area-inset-bottom))] z-20 mx-auto max-w-md rounded-[20px] border border-border bg-surface-2/90 p-1.5 shadow-hero backdrop-blur-xl">
+      <div className="grid grid-cols-4 gap-1">
         {items.map((it) => {
           const active = pathname.startsWith(it.href);
           return (
             <Link
               key={it.href}
               href={it.href}
-              className={`flex flex-col items-center gap-1.5 py-3 text-xs font-medium transition ${
+              className={
                 active
-                  ? "text-zinc-900 dark:text-zinc-100"
-                  : "text-zinc-400 hover:text-zinc-600 dark:text-zinc-500 dark:hover:text-zinc-300"
-              }`}
+                  ? "flex items-center justify-center rounded-xl bg-accent px-2.5 py-2 font-mono text-[11px] font-semibold uppercase tracking-[0.06em] text-accent-ink transition"
+                  : "flex items-center justify-center rounded-xl px-2.5 py-2 font-mono text-[11px] font-semibold uppercase tracking-[0.06em] text-ink-faint transition hover:text-ink-mute"
+              }
             >
-              <span
-                className={`h-1 w-1 rounded-full transition ${
-                  active ? "bg-lime-500" : "bg-transparent"
-                }`}
-              />
               {it.label}
             </Link>
           );

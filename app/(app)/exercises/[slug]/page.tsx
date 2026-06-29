@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { ExerciseGif } from "@/components/ExerciseGif";
+import { esMuscle, esEquipment, esLevel, esMechanic } from "@/lib/i18n";
 
 export default async function ExerciseDetailPage({
   params,
@@ -17,44 +18,47 @@ export default async function ExerciseDetailPage({
 
   if (!ex) notFound();
 
-  const meta = [ex.equipment, ex.level, ex.mechanic].filter(Boolean) as string[];
-  const muscles: string[] = [
-    ...(ex.primary_muscles ?? []),
-    ...(ex.secondary_muscles ?? []),
-  ];
+  const meta = [esEquipment(ex.equipment), esLevel(ex.level), esMechanic(ex.mechanic)]
+    .filter(Boolean)
+    .join(" · ");
+  const primary: string[] = ex.primary_muscles ?? [];
+  const secondary: string[] = ex.secondary_muscles ?? [];
 
   return (
     <article className="flex flex-col gap-6">
-      <Link
-        href="/exercises"
-        className="text-sm font-medium text-zinc-500 transition hover:text-zinc-900 dark:hover:text-zinc-100"
-      >
-        ← Biblioteca
+      <Link href="/exercises" className="kicker-accent">
+        &lt; Biblioteca
       </Link>
 
       <div>
-        <h1 className="text-2xl font-semibold tracking-tight">{ex.name}</h1>
-        {meta.length > 0 && (
-          <p className="mt-1 text-sm capitalize text-zinc-500">
-            {meta.join(" · ")}
+        <h1 className="font-display text-[26px] font-extrabold leading-tight tracking-tightd text-ink">
+          {ex.name}
+        </h1>
+        {meta && (
+          <p className="mt-1.5 font-mono text-[11px] uppercase tracking-[0.1em] text-ink-mute">
+            {meta}
           </p>
         )}
       </div>
 
       <ExerciseGif start={ex.image_start} end={ex.image_end} alt={ex.name} />
 
-      {muscles.length > 0 && (
+      {(primary.length > 0 || secondary.length > 0) && (
         <div className="flex flex-wrap gap-2">
-          {muscles.map((m, i) => (
+          {primary.map((m) => (
             <span
-              key={`${m}-${i}`}
-              className={`rounded-full px-3 py-1 text-xs font-medium capitalize ${
-                i < (ex.primary_muscles?.length ?? 0)
-                  ? "bg-lime-100 text-lime-900 dark:bg-lime-400/15 dark:text-lime-300"
-                  : "bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-300"
-              }`}
+              key={`p-${m}`}
+              className="inline-flex items-center rounded-sm border border-accent/30 bg-accent-soft px-3 py-1.5 text-xs font-medium text-accent"
             >
-              {m}
+              {esMuscle(m)}
+            </span>
+          ))}
+          {secondary.map((m) => (
+            <span
+              key={`s-${m}`}
+              className="inline-flex items-center rounded-sm border border-border bg-surface-2 px-3 py-1.5 text-xs font-medium text-ink-mute"
+            >
+              {esMuscle(m)}
             </span>
           ))}
         </div>
@@ -62,16 +66,16 @@ export default async function ExerciseDetailPage({
 
       {ex.instructions?.length > 0 && (
         <section className="flex flex-col gap-3">
-          <h2 className="text-sm font-semibold uppercase tracking-wider text-zinc-500">
-            Instrucciones
-          </h2>
+          <h2 className="kicker">// Instrucciones</h2>
           <ol className="flex flex-col gap-3">
             {ex.instructions.map((step: string, i: number) => (
-              <li key={i} className="flex gap-3 text-[15px] leading-relaxed">
-                <span className="shrink-0 font-semibold text-zinc-400">
+              <li key={i} className="flex gap-3">
+                <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-sm bg-surface-2 font-display text-sm font-extrabold tabular-nums text-accent">
                   {i + 1}
                 </span>
-                <span>{step}</span>
+                <span className="pt-0.5 text-[15px] leading-relaxed text-ink">
+                  {step}
+                </span>
               </li>
             ))}
           </ol>
@@ -79,11 +83,9 @@ export default async function ExerciseDetailPage({
       )}
 
       {ex.tips && (
-        <section className="rounded-2xl border border-zinc-200 p-4 dark:border-zinc-800">
-          <h2 className="text-sm font-semibold">Consejos</h2>
-          <p className="mt-1 text-[15px] leading-relaxed text-zinc-600 dark:text-zinc-300">
-            {ex.tips}
-          </p>
+        <section className="rounded-md border-l-[3px] border-accent bg-surface-2 p-4">
+          <h2 className="kicker">// Consejos</h2>
+          <p className="mt-1.5 text-[15px] leading-relaxed text-ink">{ex.tips}</p>
         </section>
       )}
     </article>

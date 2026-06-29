@@ -27,40 +27,54 @@ export default function LoginPage() {
   }
 
   const inputCls =
-    "w-full rounded-xl border border-zinc-200 bg-transparent px-4 py-3 text-base outline-none transition placeholder:text-zinc-400 focus:border-zinc-900 focus:ring-2 focus:ring-lime-400/40 dark:border-zinc-800 dark:focus:border-zinc-300";
+    "h-12 w-full rounded-md border border-border bg-surface-2 px-4 text-[16px] text-ink placeholder:text-ink-faint focus:border-transparent focus:bg-surface-3 focus:outline-none focus:shadow-focusring";
 
   return (
-    <main className="mx-auto flex min-h-[100dvh] w-full max-w-sm flex-col justify-center gap-8 p-6">
-      <div className="space-y-2">
-        <h1 className="text-3xl font-semibold tracking-tight">
-          Gym<span className="text-lime-500">App</span>
+    <main className="relative mx-auto flex min-h-[100dvh] w-full max-w-sm flex-col justify-center gap-8 overflow-hidden p-6">
+      <div className="pointer-events-none absolute inset-0 bg-[var(--grain)]" />
+
+      <div className="relative">
+        <h1 className="font-display text-[44px] font-extrabold leading-none tracking-tightd">
+          <span className="text-ink">GYM</span>
+          <span className="text-accent">APP</span>
         </h1>
-        <p className="text-zinc-500">Entra para empezar a entrenar.</p>
+        <p className="mt-3 text-ink-mute">Entra para empezar a entrenar.</p>
       </div>
 
-      <form onSubmit={onSubmit} className="flex flex-col gap-3">
-        <input
-          type="text"
-          placeholder="Usuario"
-          autoComplete="username"
-          autoCapitalize="none"
-          required
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-          className={inputCls}
-        />
-        <input
-          type="password"
-          placeholder="Contraseña"
-          autoComplete="current-password"
-          required
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          className={inputCls}
-        />
+      <form
+        onSubmit={onSubmit}
+        className="relative flex flex-col gap-3 rounded-xl bg-surface p-5 shadow-card"
+      >
+        <div>
+          <label className="mb-1.5 block font-mono text-[11px] uppercase tracking-kicker text-ink-mute">
+            Usuario
+          </label>
+          <input
+            type="text"
+            autoComplete="username"
+            autoCapitalize="none"
+            required
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+            className={inputCls}
+          />
+        </div>
+        <div>
+          <label className="mb-1.5 block font-mono text-[11px] uppercase tracking-kicker text-ink-mute">
+            Contraseña
+          </label>
+          <input
+            type="password"
+            autoComplete="current-password"
+            required
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            className={inputCls}
+          />
+        </div>
 
         {error && (
-          <p className="rounded-xl bg-red-50 px-4 py-2.5 text-sm text-red-700 dark:bg-red-950/50 dark:text-red-300">
+          <p className="rounded-md bg-[rgba(255,93,93,0.1)] px-4 py-2.5 text-sm text-danger">
             {error}
           </p>
         )}
@@ -68,9 +82,9 @@ export default function LoginPage() {
         <button
           type="submit"
           disabled={loading}
-          className="mt-1 rounded-xl bg-zinc-900 px-4 py-3 font-medium text-white transition hover:bg-zinc-800 active:scale-[0.99] disabled:opacity-50 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-200"
+          className="mt-2 inline-flex h-12 w-full items-center justify-center gap-2 rounded-md bg-accent px-5 font-mono text-[13px] font-semibold uppercase tracking-[0.04em] text-accent-ink shadow-glow transition active:scale-[0.985] active:bg-accent-press disabled:opacity-45 disabled:shadow-none"
         >
-          {loading ? "Entrando…" : "Entrar"}
+          {loading ? "Entrando" : "Entrar"} <span aria-hidden>→</span>
         </button>
       </form>
     </main>
