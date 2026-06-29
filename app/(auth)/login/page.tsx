@@ -26,41 +26,41 @@ export default function LoginPage() {
     }
   }
 
+  const inputCls =
+    "w-full rounded-xl border border-zinc-200 bg-transparent px-4 py-3 text-base outline-none transition placeholder:text-zinc-400 focus:border-zinc-900 focus:ring-2 focus:ring-lime-400/40 dark:border-zinc-800 dark:focus:border-zinc-300";
+
   return (
-    <main className="mx-auto flex min-h-screen w-full max-w-sm flex-col justify-center gap-6 p-6">
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight">GymApp</h1>
-        <p className="mt-1 text-neutral-500">Inicia sesión para entrenar.</p>
+    <main className="mx-auto flex min-h-[100dvh] w-full max-w-sm flex-col justify-center gap-8 p-6">
+      <div className="space-y-2">
+        <h1 className="text-3xl font-semibold tracking-tight">
+          Gym<span className="text-lime-500">App</span>
+        </h1>
+        <p className="text-zinc-500">Entra para empezar a entrenar.</p>
       </div>
 
-      <form onSubmit={onSubmit} className="flex flex-col gap-4">
-        <label className="flex flex-col gap-1 text-sm">
-          <span className="font-medium">Usuario</span>
-          <input
-            type="text"
-            autoComplete="username"
-            autoCapitalize="none"
-            required
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            className="rounded-lg border border-neutral-300 bg-transparent px-3 py-2 outline-none focus:border-neutral-900 dark:border-neutral-700 dark:focus:border-neutral-100"
-          />
-        </label>
-
-        <label className="flex flex-col gap-1 text-sm">
-          <span className="font-medium">Contraseña</span>
-          <input
-            type="password"
-            autoComplete="current-password"
-            required
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="rounded-lg border border-neutral-300 bg-transparent px-3 py-2 outline-none focus:border-neutral-900 dark:border-neutral-700 dark:focus:border-neutral-100"
-          />
-        </label>
+      <form onSubmit={onSubmit} className="flex flex-col gap-3">
+        <input
+          type="text"
+          placeholder="Usuario"
+          autoComplete="username"
+          autoCapitalize="none"
+          required
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
+          className={inputCls}
+        />
+        <input
+          type="password"
+          placeholder="Contraseña"
+          autoComplete="current-password"
+          required
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          className={inputCls}
+        />
 
         {error && (
-          <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700 dark:bg-red-950 dark:text-red-300">
+          <p className="rounded-xl bg-red-50 px-4 py-2.5 text-sm text-red-700 dark:bg-red-950/50 dark:text-red-300">
             {error}
           </p>
         )}
@@ -68,7 +68,7 @@ export default function LoginPage() {
         <button
           type="submit"
           disabled={loading}
-          className="rounded-lg bg-neutral-900 px-4 py-2.5 font-medium text-white transition hover:bg-neutral-700 disabled:opacity-50 dark:bg-white dark:text-neutral-900 dark:hover:bg-neutral-200"
+          className="mt-1 rounded-xl bg-zinc-900 px-4 py-3 font-medium text-white transition hover:bg-zinc-800 active:scale-[0.99] disabled:opacity-50 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-200"
         >
           {loading ? "Entrando…" : "Entrar"}
         </button>

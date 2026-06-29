@@ -8,12 +8,13 @@ export function ComingSoon({
   phase: string;
 }) {
   return (
-    <div className="flex flex-col items-start gap-3">
-      <h1 className="text-2xl font-bold tracking-tight">{title}</h1>
-      <p className="text-neutral-500">{desc}</p>
-      <span className="mt-1 rounded-full bg-amber-100 px-3 py-1 text-sm font-medium text-amber-800 dark:bg-amber-950 dark:text-amber-300">
-        🚧 Próximamente · {phase}
+    <div className="flex min-h-[55vh] flex-col items-start justify-center gap-3">
+      <span className="rounded-full border border-zinc-200 px-3 py-1 text-xs font-medium uppercase tracking-wider text-zinc-500 dark:border-zinc-800">
+        {phase}
       </span>
+      <h1 className="text-2xl font-semibold tracking-tight">{title}</h1>
+      <p className="max-w-sm text-zinc-500">{desc}</p>
+      <p className="text-sm text-zinc-400">Disponible próximamente.</p>
     </div>
   );
 }

@@ -2,6 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { LogoutButton } from "@/components/LogoutButton";
+import { BottomNav } from "@/components/BottomNav";
 
 export default async function AppLayout({
   children,
@@ -15,22 +16,20 @@ export default async function AppLayout({
   if (!user) redirect("/login");
 
   return (
-    <div className="mx-auto flex min-h-screen w-full max-w-2xl flex-col">
-      <header className="flex items-center justify-between border-b border-neutral-200 px-4 py-3 dark:border-neutral-800">
-        <Link href="/dashboard" className="text-lg font-bold tracking-tight">
-          GymApp
+    <div className="mx-auto flex min-h-[100dvh] w-full max-w-2xl flex-col">
+      <header className="sticky top-0 z-20 flex items-center justify-between border-b border-zinc-200/70 bg-white/80 px-5 py-3.5 backdrop-blur-lg dark:border-zinc-800/70 dark:bg-zinc-950/80">
+        <Link
+          href="/dashboard"
+          className="text-base font-semibold tracking-tight"
+        >
+          Gym<span className="text-lime-500">App</span>
         </Link>
-        <nav className="flex items-center gap-3 text-sm">
-          <Link href="/dashboard" className="hover:underline">
-            Inicio
-          </Link>
-          <Link href="/profile" className="hover:underline">
-            Perfil
-          </Link>
-          <LogoutButton />
-        </nav>
+        <LogoutButton />
       </header>
-      <main className="flex-1 p-4">{children}</main>
+
+      <main className="flex-1 px-5 py-6 pb-28">{children}</main>
+
+      <BottomNav />
     </div>
   );
 }
