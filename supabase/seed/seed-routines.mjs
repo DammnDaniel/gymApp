@@ -1,6 +1,6 @@
 // Seed de las 2 rutinas reales (idempotente: delete-then-recreate por owner+nombre).
-// Ejecutar:  node supabase/seed/seed-routines.mjs
-// Usa SUPABASE_SERVICE_ROLE_KEY (lee .env.local).
+// Ejecutar:  npm run db:seed:routines
+// Env opcional: OWNER_EL (def. daniel), OWNER_ELLA (def. ELENA). Usa SUPABASE_SERVICE_ROLE_KEY.
 import { createClient } from "@supabase/supabase-js";
 import { readFileSync } from "node:fs";
 import { randomUUID } from "node:crypto";
@@ -14,10 +14,35 @@ function parseEnv(file) {
   return out;
 }
 
-// e=[slug, sets, repsMin, repsMax, notes]   ·  movilidad: slug=null (custom)
+const env = parseEnv(".env.local");
+const url = env.NEXT_PUBLIC_SUPABASE_URL;
+const serviceKey = env.SUPABASE_SERVICE_ROLE_KEY;
+if (!url || !serviceKey) {
+  console.error("Faltan NEXT_PUBLIC_SUPABASE_URL o SUPABASE_SERVICE_ROLE_KEY en .env.local");
+  process.exit(1);
+}
+const supabase = createClient(url, serviceKey, {
+  auth: { persistSession: false },
+});
+
+const OWNER_EL = (process.env.OWNER_EL || "daniel").trim();
+const OWNER_ELLA = (process.env.OWNER_ELLA || "ELENA").trim();
+
+// Día de cardio compartido (catálogo cardio; sin series/reps, duración en notes).
+const CARDIO_DAY = {
+  name: "Cardio (opcional · 2-3×/semana)",
+  focus: "Base suave para recuperar forma y para el fondo de combate/pole",
+  exercises: [
+    ["Jogging_Treadmill", null, null, null, "20-35 min a ritmo cómodo (puedes hablar). Elige UNA opción de este día."],
+    ["Bicycling_Stationary", null, null, null, "Alternativa a la cinta. 20-35 min suave."],
+    ["Elliptical_Trainer", null, null, null, "Alternativa de bajo impacto. 20-35 min suave."],
+  ],
+};
+
+// e=[slug, sets, repsMin, repsMax, notes]  ·  movilidad: slug=null (custom)
 const ROUTINES = [
   {
-    username: "daniel",
+    username: OWNER_EL,
     name: "Entreno · Él",
     description: "Foco espalda, completo. Compagina con BJJ/MMA.",
     days: [
@@ -26,7 +51,7 @@ const ROUTINES = [
         focus: "Tirón · día principal",
         exercises: [
           ["Wide-Grip_Lat_Pulldown", 4, 6, 10, "Dominadas si te salen."],
-          ["Seated_Cable_Rows", 4, 8, 12, ""],
+          ["Leverage_Iso_Row", 4, 8, 12, ""],
           ["Close-Grip_Front_Lat_Pulldown", 3, 10, 12, ""],
           ["Straight-Arm_Dumbbell_Pullover", 3, 12, 15, ""],
           ["Seated_Bent-Over_Rear_Delt_Raise", 3, 15, 20, ""],
@@ -68,14 +93,15 @@ const ROUTINES = [
           ["One-Arm_Dumbbell_Row", 3, 10, 12, "Por lado."],
           ["Seated_Bent-Over_Rear_Delt_Raise", 3, 15, 20, ""],
           ["Farmers_Walk", 3, null, null, "20-30 s por vuelta."],
-          ["Alternate_Hammer_Curl", 3, 10, 12, ""],
+          ["Dumbbell_Alternate_Bicep_Curl", 3, 10, 12, ""],
           ["Palms-Up_Barbell_Wrist_Curl_Over_A_Bench", 3, 12, 15, ""],
         ],
       },
+      CARDIO_DAY,
     ],
   },
   {
-    username: "ELENA",
+    username: OWNER_ELLA,
     name: "Entreno · Ella",
     description: "Completo con ápice de glúteo. Practica pole.",
     movilidadName: "Movilidad de cadera y espalda",
@@ -129,25 +155,14 @@ const ROUTINES = [
           [null, null, null, null, "5-10 min de estiramientos."],
         ],
       },
+      CARDIO_DAY,
     ],
   },
 ];
 
-const env = parseEnv(".env.local");
-const url = env.NEXT_PUBLIC_SUPABASE_URL;
-const serviceKey = env.SUPABASE_SERVICE_ROLE_KEY;
-if (!url || !serviceKey) {
-  console.error("Faltan NEXT_PUBLIC_SUPABASE_URL o SUPABASE_SERVICE_ROLE_KEY en .env.local");
-  process.exit(1);
-}
-const supabase = createClient(url, serviceKey, {
-  auth: { persistSession: false },
-});
-
 for (const routine of ROUTINES) {
   console.log(`\n── ${routine.name} (@${routine.username}) ──`);
 
-  // 1) owner
   const { data: prof, error: pErr } = await supabase
     .from("profiles")
     .select("id")
@@ -159,7 +174,6 @@ for (const routine of ROUTINES) {
   }
   const ownerId = prof.id;
 
-  // 2) ejercicio custom de movilidad (si la rutina lo usa)
   let movilidadId = null;
   const usesMovilidad = routine.days.some((d) =>
     d.exercises.some((e) => e[0] === null),
@@ -187,7 +201,6 @@ for (const routine of ROUTINES) {
     movilidadId = cust.id;
   }
 
-  // 3) mapa slug -> id del catálogo (verificar que existen todos)
   const slugs = [
     ...new Set(
       routine.days.flatMap((d) =>
@@ -210,7 +223,7 @@ for (const routine of ROUTINES) {
     continue;
   }
 
-  // 4) idempotencia: borrar rutina(s) previas con mismo owner + nombre
+  // idempotencia: borrar rutina(s) previas con mismo owner + nombre (cascada)
   const { error: delErr } = await supabase
     .from("routines")
     .delete()
@@ -221,7 +234,6 @@ for (const routine of ROUTINES) {
     continue;
   }
 
-  // 5) insertar rutina -> días -> ejercicios
   const routineId = randomUUID();
   const { error: rErr } = await supabase.from("routines").insert({
     id: routineId,

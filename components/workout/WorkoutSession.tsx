@@ -43,6 +43,17 @@ function SessionBody({ day }: { day: WorkoutDay }) {
   const [state, setState] = useState<Record<string, SetRow[]>>(() => {
     const init: Record<string, SetRow[]> = {};
     for (const ex of day.exercises) {
+      if (ex.category === "cardio") {
+        const last = ex.lastSets[0];
+        const mins =
+          last?.duration_seconds != null
+            ? String(Math.round(last.duration_seconds / 60))
+            : "";
+        init[ex.rowId] = [
+          { weight: "", reps: "", rpe: "", minutes: mins, done: false },
+        ];
+        continue;
+      }
       const n = Math.max(ex.target_sets ?? 0, ex.lastSets.length, 1);
       init[ex.rowId] = Array.from({ length: n }, (_, i) => {
         const last = ex.lastSets[i];
@@ -50,6 +61,7 @@ function SessionBody({ day }: { day: WorkoutDay }) {
           weight: last?.weight_kg != null ? String(last.weight_kg) : "",
           reps: last?.reps != null ? String(last.reps) : "",
           rpe: last?.rpe != null ? String(last.rpe) : "",
+          minutes: "",
           done: false,
         };
       });
@@ -71,7 +83,24 @@ function SessionBody({ day }: { day: WorkoutDay }) {
   async function onFinish() {
     const sets: SaveSetInput[] = [];
     for (const ex of day.exercises) {
-      (state[ex.rowId] ?? []).forEach((r, i) => {
+      const rows = state[ex.rowId] ?? [];
+      if (ex.category === "cardio") {
+        const r = rows[0];
+        if (r && (r.done || r.minutes !== "")) {
+          const mins = parseInt(r.minutes, 10);
+          sets.push({
+            exerciseId: ex.exerciseId,
+            set_number: 1,
+            weight_kg: null,
+            reps: null,
+            rpe: null,
+            duration_seconds: Number.isFinite(mins) ? mins * 60 : null,
+            is_warmup: false,
+          });
+        }
+        continue;
+      }
+      rows.forEach((r, i) => {
         const hasData = r.done || r.weight !== "" || r.reps !== "";
         if (!hasData) return;
         const w = parseFloat(r.weight.replace(",", "."));
@@ -83,6 +112,7 @@ function SessionBody({ day }: { day: WorkoutDay }) {
           weight_kg: Number.isFinite(w) ? w : null,
           reps: Number.isFinite(reps) ? reps : null,
           rpe: Number.isFinite(rpe) ? rpe : null,
+          duration_seconds: null,
           is_warmup: false,
         });
       });

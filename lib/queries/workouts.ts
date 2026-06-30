@@ -5,6 +5,7 @@ export type LastSet = {
   weight_kg: number | null;
   reps: number | null;
   rpe: number | null;
+  duration_seconds: number | null;
 };
 
 export type WorkoutExercise = {
@@ -14,6 +15,7 @@ export type WorkoutExercise = {
   name: string;
   name_es: string | null;
   image_start: string | null;
+  category: string | null;
   target_sets: number | null;
   target_reps_min: number | null;
   target_reps_max: number | null;
@@ -46,7 +48,7 @@ export function useWorkoutDay(dayId: string) {
            routine:routines(name),
            routine_exercises (
              id, exercise_id, position, target_sets, target_reps_min, target_reps_max, notes,
-             exercise:exercises ( slug, name, name_es, image_start )
+             exercise:exercises ( slug, name, name_es, image_start, category )
            )`,
         )
         .eq("id", dayId)
@@ -65,7 +67,9 @@ export function useWorkoutDay(dayId: string) {
       if (exerciseIds.length) {
         const { data: logs } = await supabase
           .from("set_logs")
-          .select("exercise_id, session_id, set_number, weight_kg, reps, rpe, created_at")
+          .select(
+            "exercise_id, session_id, set_number, weight_kg, reps, rpe, duration_seconds, created_at",
+          )
           .in("exercise_id", exerciseIds)
           .eq("is_warmup", false)
           .order("created_at", { ascending: false })
@@ -78,7 +82,12 @@ export function useWorkoutDay(dayId: string) {
         for (const l of (logs ?? []) as any[]) {
           if (latestSession.get(l.exercise_id) !== l.session_id) continue;
           const arr = lastByExercise.get(l.exercise_id) ?? [];
-          arr.push({ weight_kg: l.weight_kg, reps: l.reps, rpe: l.rpe });
+          arr.push({
+            weight_kg: l.weight_kg,
+            reps: l.reps,
+            rpe: l.rpe,
+            duration_seconds: l.duration_seconds,
+          });
           lastByExercise.set(l.exercise_id, arr);
         }
       }
@@ -90,6 +99,7 @@ export function useWorkoutDay(dayId: string) {
         name: r.exercise?.name ?? "Ejercicio",
         name_es: r.exercise?.name_es ?? null,
         image_start: r.exercise?.image_start ?? null,
+        category: r.exercise?.category ?? null,
         target_sets: r.target_sets,
         target_reps_min: r.target_reps_min,
         target_reps_max: r.target_reps_max,
@@ -113,6 +123,7 @@ export type SaveSetInput = {
   weight_kg: number | null;
   reps: number | null;
   rpe: number | null;
+  duration_seconds: number | null;
   is_warmup: boolean;
 };
 
@@ -148,6 +159,7 @@ export function useSaveWorkout() {
           weight_kg: s.weight_kg,
           reps: s.reps,
           rpe: s.rpe,
+          duration_seconds: s.duration_seconds,
           is_warmup: s.is_warmup,
         }));
         const { error: lErr } = await supabase.from("set_logs").insert(rows);
