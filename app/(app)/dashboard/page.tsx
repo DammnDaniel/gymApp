@@ -18,6 +18,7 @@ export default async function DashboardPage() {
     { href: "/exercises", title: "Biblioteca", desc: "Ejercicios, técnica y consejos" },
     { href: "/routines", title: "Rutinas", desc: "Tus días y ejercicios" },
     { href: "/progress", title: "Progreso", desc: "Cargas, récords y evolución" },
+    { href: "/history", title: "Historial", desc: "Sesiones registradas · editar/borrar" },
   ];
 
   return (

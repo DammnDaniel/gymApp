@@ -170,3 +170,171 @@ export function useSaveWorkout() {
     onSettled: () => qc.invalidateQueries({ queryKey: workoutKeys.all }),
   });
 }
+
+// ─── Historial de sesiones (ver / editar / borrar) ──────────────────
+export type SessionListItem = {
+  id: string;
+  performed_at: string;
+  duration_seconds: number | null;
+  dayName: string | null;
+  routineName: string | null;
+  setCount: number;
+};
+
+export type SessionSetRow = {
+  id: string;
+  set_number: number;
+  weight_kg: number | null;
+  reps: number | null;
+  rpe: number | null;
+  duration_seconds: number | null;
+};
+
+export type SessionExercise = {
+  exerciseId: string;
+  name: string;
+  category: string | null;
+  sets: SessionSetRow[];
+};
+
+export type SessionDetail = {
+  id: string;
+  performed_at: string;
+  duration_seconds: number | null;
+  dayName: string | null;
+  routineName: string | null;
+  exercises: SessionExercise[];
+};
+
+export const sessionKeys = {
+  all: ["sessions"] as const,
+  list: () => ["sessions", "list"] as const,
+  detail: (id: string) => ["sessions", "detail", id] as const,
+};
+
+export function useSessions() {
+  return useQuery({
+    queryKey: sessionKeys.list(),
+    queryFn: async (): Promise<SessionListItem[]> => {
+      const supabase = createClient();
+      const { data, error } = await supabase
+        .from("workout_sessions")
+        .select(
+          "id, performed_at, duration_seconds, routine_day:routine_days(name, routine:routines(name)), set_logs(count)",
+        )
+        .order("performed_at", { ascending: false });
+      if (error) throw error;
+      return (data ?? []).map((s: any) => ({
+        id: s.id,
+        performed_at: s.performed_at,
+        duration_seconds: s.duration_seconds,
+        dayName: s.routine_day?.name ?? null,
+        routineName: s.routine_day?.routine?.name ?? null,
+        setCount: s.set_logs?.[0]?.count ?? 0,
+      }));
+    },
+  });
+}
+
+export function useSessionDetail(id: string) {
+  return useQuery({
+    queryKey: sessionKeys.detail(id),
+    enabled: !!id,
+    queryFn: async (): Promise<SessionDetail | null> => {
+      const supabase = createClient();
+      const { data, error } = await supabase
+        .from("workout_sessions")
+        .select(
+          "id, performed_at, duration_seconds, routine_day:routine_days(name, routine:routines(name)), set_logs(id, exercise_id, set_number, weight_kg, reps, rpe, duration_seconds, exercise:exercises(name, name_es, category))",
+        )
+        .eq("id", id)
+        .maybeSingle();
+      if (error) throw error;
+      if (!data) return null;
+      const raw = data as any;
+      const byEx = new Map<string, SessionExercise>();
+      const order: string[] = [];
+      for (const l of (raw.set_logs ?? []) as any[]) {
+        if (!byEx.has(l.exercise_id)) {
+          byEx.set(l.exercise_id, {
+            exerciseId: l.exercise_id,
+            name: l.exercise?.name_es ?? l.exercise?.name ?? "Ejercicio",
+            category: l.exercise?.category ?? null,
+            sets: [],
+          });
+          order.push(l.exercise_id);
+        }
+        byEx.get(l.exercise_id)!.sets.push({
+          id: l.id,
+          set_number: l.set_number,
+          weight_kg: l.weight_kg,
+          reps: l.reps,
+          rpe: l.rpe,
+          duration_seconds: l.duration_seconds,
+        });
+      }
+      for (const ex of byEx.values())
+        ex.sets.sort((a, b) => a.set_number - b.set_number);
+      return {
+        id: raw.id,
+        performed_at: raw.performed_at,
+        duration_seconds: raw.duration_seconds,
+        dayName: raw.routine_day?.name ?? null,
+        routineName: raw.routine_day?.routine?.name ?? null,
+        exercises: order.map((eid) => byEx.get(eid)!),
+      };
+    },
+  });
+}
+
+export function useDeleteSession() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (id: string) => {
+      const supabase = createClient();
+      const { error } = await supabase
+        .from("workout_sessions")
+        .delete()
+        .eq("id", id);
+      if (error) throw error;
+    },
+    onSettled: () => qc.invalidateQueries(),
+  });
+}
+
+export function useUpdateSetLog() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (input: {
+      sessionId: string;
+      setId: string;
+      patch: Partial<
+        Pick<SessionSetRow, "weight_kg" | "reps" | "rpe" | "duration_seconds">
+      >;
+    }) => {
+      const supabase = createClient();
+      const { error } = await supabase
+        .from("set_logs")
+        .update(input.patch)
+        .eq("id", input.setId);
+      if (error) throw error;
+    },
+    onSettled: () => qc.invalidateQueries(),
+  });
+}
+
+export function useDeleteSetLog() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: async (input: { sessionId: string; setId: string }) => {
+      const supabase = createClient();
+      const { error } = await supabase
+        .from("set_logs")
+        .delete()
+        .eq("id", input.setId);
+      if (error) throw error;
+    },
+    onSettled: (_d, _e, input) =>
+      qc.invalidateQueries({ queryKey: sessionKeys.detail(input.sessionId) }),
+  });
+}
