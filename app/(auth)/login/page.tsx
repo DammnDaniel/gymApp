@@ -1,11 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
 import { loginRequest } from "@/lib/auth";
 
 export default function LoginPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -60,9 +62,17 @@ export default function LoginPage() {
           />
         </div>
         <div>
-          <label className="mb-1.5 block font-mono text-[11px] uppercase tracking-kicker text-ink-mute">
-            Contraseña
-          </label>
+          <div className="mb-1.5 flex items-center justify-between gap-3">
+            <label className="font-mono text-[11px] uppercase tracking-kicker text-ink-mute">
+              Contraseña
+            </label>
+            <Link
+              href="/forgot-password"
+              className="text-xs font-medium text-accent transition hover:text-accent-press"
+            >
+              La he olvidado
+            </Link>
+          </div>
           <input
             type="password"
             autoComplete="current-password"
@@ -73,8 +83,20 @@ export default function LoginPage() {
           />
         </div>
 
+        {searchParams.get("passwordUpdated") === "1" && (
+          <p
+            role="status"
+            className="rounded-md border border-accent/20 bg-accent-soft px-4 py-2.5 text-sm text-ink"
+          >
+            Contraseña actualizada. Ya puedes iniciar sesión.
+          </p>
+        )}
+
         {error && (
-          <p className="rounded-md bg-[rgba(255,93,93,0.1)] px-4 py-2.5 text-sm text-danger">
+          <p
+            role="alert"
+            className="rounded-md bg-[rgba(255,93,93,0.1)] px-4 py-2.5 text-sm text-danger"
+          >
             {error}
           </p>
         )}
