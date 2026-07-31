@@ -35,8 +35,12 @@ export async function updateSession(request: NextRequest) {
   } = await supabase.auth.getUser();
 
   const path = request.nextUrl.pathname;
-  const isAuthPage = path.startsWith("/login") || path.startsWith("/register");
-  const isPublic = isAuthPage || path === "/";
+  const isEntryPage =
+    path.startsWith("/login") ||
+    path.startsWith("/register") ||
+    path.startsWith("/forgot-password");
+  const isPasswordUpdate = path.startsWith("/update-password");
+  const isPublic = isEntryPage || isPasswordUpdate || path === "/";
 
   // sin sesión y ruta privada -> a login
   if (!user && !isPublic) {
@@ -44,8 +48,9 @@ export async function updateSession(request: NextRequest) {
     url.pathname = "/login";
     return NextResponse.redirect(url);
   }
-  // con sesión y en login/registro -> al dashboard
-  if (user && isAuthPage) {
+  // con sesión y en una pantalla de entrada -> al dashboard. La pantalla de
+  // cambio de contraseña se mantiene accesible para procesar el enlace.
+  if (user && isEntryPage) {
     const url = request.nextUrl.clone();
     url.pathname = "/dashboard";
     return NextResponse.redirect(url);
