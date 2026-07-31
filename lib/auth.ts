@@ -36,6 +36,17 @@ export async function loginRequest(username: string, password: string) {
   return data;
 }
 
+/** Solicita un enlace de recuperación sin revelar el email del perfil. */
+export async function passwordResetRequest(username: string) {
+  const { ok, data } = await callFn("password-reset", { username });
+  if (!ok) {
+    throw new Error(
+      data?.error || "No se pudo solicitar el cambio de contraseña",
+    );
+  }
+  return data;
+}
+
 /** Cierra la sesión. */
 export async function logout() {
   const supabase = createClient();
