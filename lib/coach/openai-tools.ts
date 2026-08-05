@@ -1,9 +1,9 @@
-import type { Tool } from "openai/resources/responses/responses";
+import type { ChatCompletionTool } from "openai/resources/chat/completions";
 
 const nullableString = { type: ["string", "null"] } as const;
 const nullableInteger = { type: ["integer", "null"] } as const;
 
-export const coachTools: Tool[] = [
+const responseTools = [
   {
     type: "function",
     name: "get_routine_details",
@@ -171,3 +171,11 @@ export const coachTools: Tool[] = [
   },
 ];
 
+export const coachTools: ChatCompletionTool[] = responseTools.map((tool) => ({
+  type: "function",
+  function: {
+    name: tool.name,
+    description: tool.description,
+    parameters: tool.parameters,
+  },
+}));
