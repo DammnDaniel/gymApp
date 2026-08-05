@@ -3,11 +3,14 @@ import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { ExerciseGif } from "@/components/ExerciseGif";
 import { esMuscle, esEquipment, esLevel, esMechanic } from "@/lib/i18n";
+import { returnLabel, safeReturnPath } from "@/lib/navigation";
 
 export default async function ExerciseDetailPage({
   params,
+  searchParams,
 }: {
   params: { slug: string };
+  searchParams: { from?: string | string[] };
 }) {
   const supabase = createClient();
   const { data: ex } = await supabase
@@ -26,11 +29,12 @@ export default async function ExerciseDetailPage({
   const title: string = ex.name_es ?? ex.name;
   const instructions: string[] =
     ex.instructions_es?.length ? ex.instructions_es : (ex.instructions ?? []);
+  const returnTo = safeReturnPath(searchParams.from);
 
   return (
     <article className="flex flex-col gap-6">
-      <Link href="/exercises" className="kicker-accent">
-        &lt; Biblioteca
+      <Link href={returnTo} className="kicker-accent">
+        &lt; {returnLabel(returnTo)}
       </Link>
 
       <div>
