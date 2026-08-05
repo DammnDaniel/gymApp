@@ -3,60 +3,81 @@
 @tailwind utilities;
 
 :root {
-  --bg: #0a0b0d;
-  --bg-elev-0: #0e0f12;
-  --surface: #141619;
-  --surface-2: #1b1e22;
-  --surface-3: #23272c;
-  --border: #262a30;
-  --border-strong: #363b42;
-  --text: #f4f5f6;
-  --text-mute: #9aa0a6;
-  --text-faint: #5b6068;
-  --accent: #d8ff3e;
-  --accent-press: #c2e82b;
-  --accent-soft: rgba(216, 255, 62, 0.12);
-  --accent-ink: #0a0b0d;
-  --danger: #ff5d5d;
-  --shadow-card: 0 1px 0 0 rgba(255, 255, 255, 0.03) inset,
-    0 8px 24px -12px rgba(0, 0, 0, 0.6);
-  --shadow-hero: 0 1px 0 0 rgba(255, 255, 255, 0.05) inset,
-    0 24px 60px -24px rgba(0, 0, 0, 0.8);
-  --glow-accent: 0 8px 30px -8px rgba(216, 255, 62, 0.35);
-  --focus-ring: 0 0 0 3px rgba(216, 255, 62, 0.35);
-  --grain: radial-gradient(
-    120% 120% at 50% -10%,
-    rgba(216, 255, 62, 0.06),
-    transparent 55%
-  );
-  color-scheme: dark;
+  --bg: #ecece5;
+  --bg-elev-0: #f5f4ed;
+  --surface: #faf9f2;
+  --surface-2: #e1e2da;
+  --surface-3: #d3d5cc;
+  --border: #c4c7bd;
+  --border-strong: #171e1d;
+  --text: #141a19;
+  --text-mute: #535c58;
+  --text-faint: #5f6864;
+  --accent: #ff6138;
+  --accent-press: #c32f10;
+  --accent-soft: rgba(255, 97, 56, 0.13);
+  --accent-ink: #151a19;
+  --signal: #3157d9;
+  --signal-soft: rgba(49, 87, 217, 0.12);
+  --inverse: #151b1a;
+  --inverse-text: #f7f5ec;
+  --danger: #c72d27;
+  --shadow-card: 0 1px 0 rgba(255, 255, 255, 0.8) inset,
+    0 12px 28px -24px rgba(20, 26, 25, 0.45);
+  --shadow-hero: 0 22px 70px -42px rgba(20, 26, 25, 0.72);
+  --glow-accent: 0 12px 28px -18px rgba(255, 97, 56, 0.75);
+  --focus-ring: 0 0 0 3px rgba(49, 87, 217, 0.3);
+  --grain: linear-gradient(rgba(20, 26, 25, 0.055) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(20, 26, 25, 0.055) 1px, transparent 1px);
+  color-scheme: light;
 }
 
 html {
-  background: #0a0b0d; /* mata la banda blanca antes de pintar React */
+  background: var(--bg);
   -webkit-tap-highlight-color: transparent;
 }
 
 body {
   background:
-    radial-gradient(circle at 50% -20%, rgba(216, 255, 62, 0.08), transparent 34rem),
-    #0e0f12;
-  color: #f4f5f6;
+    radial-gradient(circle at 14% -8%, rgba(255, 97, 56, 0.13), transparent 29rem),
+    var(--bg);
+  color: var(--text);
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
 }
 
 ::selection {
-  background: #d8ff3e;
-  color: #0a0b0d;
+  background: var(--accent);
+  color: var(--accent-ink);
 }
 
 @layer components {
   .kicker {
-    @apply font-mono text-[11px] uppercase tracking-kicker text-ink-mute;
+    @apply font-mono text-[11px] font-medium uppercase tracking-kicker text-ink-mute;
   }
   .kicker-accent {
-    @apply font-mono text-[11px] uppercase tracking-kicker text-accent;
+    @apply font-mono text-[11px] font-semibold uppercase tracking-kicker text-accent-press;
+  }
+  .page-title {
+    @apply font-display text-[clamp(2.3rem,9vw,4.75rem)] font-black leading-[0.88] tracking-[-0.065em] text-ink;
+  }
+  .section-title {
+    @apply font-display text-xl font-extrabold leading-tight tracking-[-0.035em] text-ink;
+  }
+  .panel {
+    @apply border border-border bg-surface shadow-card;
+  }
+  .field {
+    @apply min-h-12 w-full rounded-none border border-border bg-surface px-4 text-[16px] text-ink outline-none placeholder:text-ink-faint focus:border-signal focus:shadow-focusring;
+  }
+  .button-primary {
+    @apply inline-flex min-h-12 items-center justify-center gap-2 rounded-none border border-ink bg-accent px-5 font-mono text-[12px] font-bold uppercase tracking-[0.06em] text-accent-ink shadow-glow transition hover:bg-accent-press hover:text-[var(--inverse-text)] active:translate-y-px disabled:cursor-not-allowed disabled:opacity-45;
+  }
+  .button-secondary {
+    @apply inline-flex min-h-11 items-center justify-center gap-2 rounded-none border border-border-strong bg-transparent px-4 font-mono text-[11px] font-semibold uppercase tracking-[0.06em] text-ink transition hover:bg-ink hover:text-[var(--inverse-text)] active:translate-y-px disabled:opacity-45;
+  }
+  .rule-label {
+    @apply flex items-center gap-3 font-mono text-[10px] font-semibold uppercase tracking-[0.14em] text-ink-mute before:h-px before:w-6 before:bg-accent;
   }
 }
 
@@ -66,7 +87,8 @@ body {
 button,
 a,
 input,
-select {
+select,
+textarea {
   -webkit-tap-highlight-color: transparent;
 }
 button:focus-visible,
@@ -75,6 +97,17 @@ input:focus-visible,
 select:focus-visible {
   outline: none;
   box-shadow: var(--focus-ring);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
 .no-scrollbar::-webkit-scrollbar {
   display: none;

@@ -79,11 +79,11 @@ export function DaySection({
   }
 
   return (
-    <section className="rounded-lg bg-surface p-4 shadow-card">
-      <div className="mb-3 flex items-start justify-between gap-2">
+    <section className="border border-ink bg-surface p-4 shadow-card sm:p-5">
+      <div className="mb-4 flex items-start justify-between gap-3 border-b border-ink/20 pb-4">
         <div className="min-w-0 flex-1">
           {readOnly ? <>
-            <h2 className="font-display text-lg font-extrabold tracking-tightd text-ink">{day.name}</h2>
+            <h2 className="font-display text-2xl font-black tracking-[-0.045em] text-ink">{day.name}</h2>
             {day.focus && <p className="mt-0.5 font-mono text-[11px] uppercase tracking-[0.1em] text-ink-mute">{day.focus}</p>}
           </> : <><input
             value={name}
@@ -93,7 +93,7 @@ export function DaySection({
               if (v && v !== day.name)
                 updateDay.mutate({ routineId, dayId: day.id, name: v });
             }}
-            className="w-full bg-transparent font-display text-lg font-extrabold tracking-tightd text-ink outline-none"
+            className="w-full bg-transparent font-display text-2xl font-black tracking-[-0.045em] text-ink outline-none"
           />
           <input
             value={focus}
@@ -114,7 +114,7 @@ export function DaySection({
         {!readOnly && <div className="flex shrink-0 flex-col items-end gap-1.5">
           <Link
             href={`/workout/${day.id}`}
-            className="inline-flex h-8 items-center gap-1 rounded-sm bg-accent px-3 font-mono text-[11px] font-semibold uppercase tracking-[0.04em] text-accent-ink shadow-glow transition active:scale-[0.97]"
+            className="inline-flex min-h-10 items-center gap-2 border border-ink bg-accent px-3 font-mono text-[10px] font-bold uppercase tracking-[0.06em] text-accent-ink shadow-glow transition active:translate-y-px"
           >
             ▶ Entrenar
           </Link>
@@ -127,7 +127,7 @@ export function DaySection({
                 window.alert("No se pudo borrar el día.");
               }
             }}
-            className="font-mono text-[10px] uppercase tracking-[0.1em] text-ink-faint transition hover:text-danger"
+            className="min-h-8 font-mono text-[9px] font-semibold uppercase tracking-[0.1em] text-ink-mute transition hover:text-danger"
           >
             Borrar
           </button>
@@ -147,7 +147,7 @@ export function DaySection({
           onDragCancel={() => setActiveId(null)}
         >
           <SortableContext items={items} strategy={verticalListSortingStrategy}>
-            <div className="flex flex-col gap-2">
+            <div className="flex flex-col border-t border-ink/15">
               {day.routine_exercises.map((re) => (
                 <SortableExerciseItem
                   key={re.id}
@@ -163,7 +163,7 @@ export function DaySection({
             createPortal(
               <DragOverlay>
                 {activeRe ? (
-                  <div className="rounded-md bg-surface-2 p-3 text-sm font-semibold text-ink shadow-hero">
+                  <div className="border border-ink bg-surface p-3 text-sm font-semibold text-ink shadow-hero">
                     {activeRe.exercise?.name_es ?? activeRe.exercise?.name ?? "Ejercicio"}
                   </div>
                 ) : null}
@@ -175,7 +175,7 @@ export function DaySection({
 
       {!readOnly && <button
         onClick={() => setPicker(true)}
-        className="mt-3 w-full rounded-md border border-dashed border-border-strong py-2.5 font-mono text-[11px] uppercase tracking-[0.1em] text-ink-mute transition hover:border-accent/40 hover:text-accent"
+        className="mt-4 min-h-11 w-full border border-dashed border-ink/50 py-2.5 font-mono text-[10px] font-semibold uppercase tracking-[0.12em] text-ink-mute transition hover:border-accent-press hover:text-accent-press"
       >
         + Añadir ejercicio
       </button>}

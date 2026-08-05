@@ -5,11 +5,11 @@ import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase/client";
+import { AuthFrame } from "@/components/AuthFrame";
 
 type RecoveryStatus = "checking" | "ready" | "invalid" | "done";
 
-const inputClass =
-  "h-12 w-full rounded-md border border-border bg-surface-2 px-4 text-[16px] text-ink placeholder:text-ink-faint focus:border-transparent focus:bg-surface-3 focus:outline-none focus:shadow-focusring";
+const inputClass = "field";
 
 function getJwtSubject(token: string | null) {
   if (!token) return null;
@@ -107,55 +107,32 @@ export default function UpdatePasswordPage() {
 
   if (status === "checking") {
     return (
-      <main className="flex min-h-[100dvh] items-center justify-center bg-bg-0 p-6">
-        <p role="status" className="font-mono text-sm text-ink-mute">
-          Validando el enlace…
-        </p>
+      <main className="flex min-h-[100dvh] items-center justify-center bg-inverse p-6">
+        <p role="status" className="border-l-4 border-accent pl-4 font-mono text-sm text-[var(--inverse-text)]">Validando el enlace…</p>
       </main>
     );
   }
 
   if (status === "invalid") {
     return (
-      <main className="relative mx-auto flex min-h-[100dvh] w-full max-w-sm flex-col justify-center gap-6 overflow-hidden p-6">
-        <div className="pointer-events-none absolute inset-0 bg-[var(--grain)]" />
-        <section className="relative rounded-xl bg-surface p-5 shadow-card">
-          <p className="kicker-accent">// Enlace no válido</p>
-          <h1 className="mt-2 font-display text-3xl font-extrabold tracking-tightd text-ink">
-            Solicita otro enlace
-          </h1>
-          <p className="mt-3 text-sm leading-6 text-ink-mute">
-            El enlace ha caducado, ya se ha usado o no contiene una sesión de
-            recuperación válida.
-          </p>
+      <AuthFrame eyebrow="Enlace no válido" title={<>Solicita<br />otro enlace.</>} description="El enlace ha caducado, ya se ha usado o no contiene una sesión de recuperación válida.">
+        <section>
           <Link
             href="/forgot-password"
-            className="mt-5 inline-flex h-12 w-full items-center justify-center rounded-md bg-accent px-5 font-mono text-[13px] font-semibold uppercase tracking-[0.04em] text-accent-ink shadow-glow"
+            className="button-primary w-full"
           >
             Solicitar otro
           </Link>
         </section>
-      </main>
+      </AuthFrame>
     );
   }
 
   return (
-    <main className="relative mx-auto flex min-h-[100dvh] w-full max-w-sm flex-col justify-center gap-7 overflow-hidden p-6">
-      <div className="pointer-events-none absolute inset-0 bg-[var(--grain)]" />
-
-      <div className="relative">
-        <p className="kicker-accent">// Último paso</p>
-        <h1 className="mt-2 font-display text-4xl font-extrabold leading-none tracking-tightd text-ink">
-          Crea una contraseña nueva
-        </h1>
-        <p className="mt-3 text-sm leading-6 text-ink-mute">
-          Usa al menos 8 caracteres y no reutilices la contraseña anterior.
-        </p>
-      </div>
-
+    <AuthFrame eyebrow="Último paso" title={<>Nueva<br />contraseña.</>} description="Usa al menos 8 caracteres y no reutilices la contraseña anterior.">
       <form
         onSubmit={onSubmit}
-        className="relative flex flex-col gap-4 rounded-xl bg-surface p-5 shadow-card"
+        className="flex flex-col gap-4 border-t border-ink pt-6"
       >
         <div>
           <label
@@ -197,7 +174,7 @@ export default function UpdatePasswordPage() {
         {error && (
           <p
             role="alert"
-            className="rounded-md bg-[rgba(255,93,93,0.1)] px-4 py-2.5 text-sm text-danger"
+            className="border-l-4 border-danger bg-[rgba(199,45,39,0.09)] px-4 py-3 text-sm text-danger"
           >
             {error}
           </p>
@@ -206,11 +183,11 @@ export default function UpdatePasswordPage() {
         <button
           type="submit"
           disabled={loading || status === "done"}
-          className="inline-flex h-12 w-full items-center justify-center rounded-md bg-accent px-5 font-mono text-[13px] font-semibold uppercase tracking-[0.04em] text-accent-ink shadow-glow transition active:scale-[0.985] disabled:opacity-45 disabled:shadow-none"
+          className="button-primary w-full"
         >
           {loading ? "Guardando…" : "Guardar contraseña"}
         </button>
       </form>
-    </main>
+    </AuthFrame>
   );
 }

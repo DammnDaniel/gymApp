@@ -3,9 +3,9 @@
 import Link from "next/link";
 import { useState } from "react";
 import { passwordResetRequest } from "@/lib/auth";
+import { AuthFrame } from "@/components/AuthFrame";
 
-const inputClass =
-  "h-12 w-full rounded-md border border-border bg-surface-2 px-4 text-[16px] text-ink placeholder:text-ink-faint focus:border-transparent focus:bg-surface-3 focus:outline-none focus:shadow-focusring";
+const inputClass = "field";
 
 export default function ForgotPasswordPage() {
   const [username, setUsername] = useState("");
@@ -33,23 +33,10 @@ export default function ForgotPasswordPage() {
   }
 
   return (
-    <main className="relative mx-auto flex min-h-[100dvh] w-full max-w-sm flex-col justify-center gap-7 overflow-hidden p-6">
-      <div className="pointer-events-none absolute inset-0 bg-[var(--grain)]" />
-
-      <div className="relative">
-        <p className="kicker-accent">// Recuperar acceso</p>
-        <h1 className="mt-2 font-display text-4xl font-extrabold leading-none tracking-tightd text-ink">
-          Cambia tu contraseña
-        </h1>
-        <p className="mt-3 text-sm leading-6 text-ink-mute">
-          Introduce tu usuario. Te enviaremos un enlace al correo asociado a tu
-          cuenta; nunca mostraremos esa dirección aquí.
-        </p>
-      </div>
-
+    <AuthFrame eyebrow="Recuperar acceso" title={<>Cambia tu<br />contraseña.</>} description="Introduce tu usuario. Te enviaremos un enlace al correo asociado; nunca mostraremos esa dirección aquí.">
       {sent ? (
-        <section className="relative rounded-xl border border-accent/20 bg-surface p-5 shadow-card">
-          <div className="flex h-11 w-11 items-center justify-center rounded-full bg-accent-soft text-xl text-accent">
+        <section className="border border-ink bg-surface p-5 shadow-card">
+          <div className="flex h-11 w-11 items-center justify-center bg-inverse text-xl text-accent">
             ✓
           </div>
           <h2 className="mt-4 font-display text-xl font-bold text-ink">
@@ -62,7 +49,7 @@ export default function ForgotPasswordPage() {
           <button
             type="button"
             onClick={() => setSent(false)}
-            className="mt-5 h-11 w-full rounded-md border border-border-strong bg-surface-2 px-4 text-sm font-semibold text-ink transition active:scale-[0.985]"
+            className="button-secondary mt-5 w-full"
           >
             Volver a intentarlo
           </button>
@@ -70,7 +57,7 @@ export default function ForgotPasswordPage() {
       ) : (
         <form
           onSubmit={onSubmit}
-          className="relative flex flex-col gap-4 rounded-xl bg-surface p-5 shadow-card"
+          className="flex flex-col gap-4 border-t border-ink pt-6"
         >
           <div>
             <label
@@ -97,7 +84,7 @@ export default function ForgotPasswordPage() {
           {error && (
             <p
               role="alert"
-              className="rounded-md bg-[rgba(255,93,93,0.1)] px-4 py-2.5 text-sm text-danger"
+              className="border-l-4 border-danger bg-[rgba(199,45,39,0.09)] px-4 py-3 text-sm text-danger"
             >
               {error}
             </p>
@@ -106,7 +93,7 @@ export default function ForgotPasswordPage() {
           <button
             type="submit"
             disabled={loading || !username.trim()}
-            className="inline-flex h-12 w-full items-center justify-center rounded-md bg-accent px-5 font-mono text-[13px] font-semibold uppercase tracking-[0.04em] text-accent-ink shadow-glow transition active:scale-[0.985] disabled:opacity-45 disabled:shadow-none"
+            className="button-primary w-full"
           >
             {loading ? "Enviando…" : "Enviar enlace"}
           </button>
@@ -115,10 +102,10 @@ export default function ForgotPasswordPage() {
 
       <Link
         href="/login"
-        className="relative text-center text-sm font-medium text-ink-mute transition hover:text-ink"
+        className="mt-6 block min-h-11 text-center text-sm font-semibold text-ink-mute transition hover:text-ink"
       >
         ← Volver al inicio de sesión
       </Link>
-    </main>
+    </AuthFrame>
   );
 }

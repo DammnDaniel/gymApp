@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useRoutines, useCreateRoutine } from "@/lib/queries/routines";
 import { RoutineCard } from "@/components/routines/RoutineCard";
+import { PageIntro } from "@/components/PageIntro";
 
 export default function RoutinesPage() {
   const router = useRouter();
@@ -19,36 +20,30 @@ export default function RoutinesPage() {
   }
 
   return (
-    <div className="flex flex-col gap-5">
-      <div className="flex items-end justify-between">
-        <div>
-          <p className="kicker">// Rutinas</p>
-          <div className="mt-1 flex items-baseline gap-2">
-            <span className="font-display text-stat font-extrabold tabular-nums text-ink">
-              {data ? data.length : "—"}
-            </span>
-            <span className="font-mono text-[11px] uppercase tracking-kicker text-ink-mute">
-              {data && data.length === 1 ? "rutina" : "rutinas"}
-            </span>
-          </div>
-        </div>
-        <button
+    <div className="flex flex-col gap-8">
+      <PageIntro
+        eyebrow="Programación"
+        title="El plan."
+        count={data ? data.length : "—"}
+        countLabel={data && data.length === 1 ? "rutina" : "rutinas"}
+        description="Tus semanas de trabajo y la rutina compartida, en un solo índice."
+        action={<button
           onClick={onCreate}
           disabled={create.isPending}
-          className="inline-flex h-10 items-center gap-1.5 rounded-md bg-accent px-4 font-mono text-[12px] font-semibold uppercase tracking-[0.04em] text-accent-ink shadow-glow transition active:scale-[0.97] disabled:opacity-50"
+          className="button-primary min-h-10 px-4"
         >
           {create.isPending ? "Creando" : "+ Nueva"}
-        </button>
-      </div>
+        </button>}
+      />
 
       {error && (
         <p className="text-sm text-danger">No se pudieron cargar las rutinas.</p>
       )}
 
       {isLoading ? (
-        <div className="flex flex-col gap-3">
+        <div className="flex flex-col border-t border-ink">
           {Array.from({ length: 3 }).map((_, i) => (
-            <div key={i} className="h-20 animate-pulse rounded-lg bg-surface-3" />
+            <div key={i} className="h-24 animate-pulse border border-border bg-surface-3" />
           ))}
         </div>
       ) : data && data.length > 0 ? (
@@ -58,12 +53,12 @@ export default function RoutinesPage() {
           ))}
         </div>
       ) : (
-        <div className="rounded-lg bg-surface p-6 text-center shadow-card">
+        <div className="panel p-8 text-center">
           <p className="text-ink-mute">Aún no tienes rutinas.</p>
           <button
             onClick={onCreate}
             disabled={create.isPending}
-            className="mt-4 inline-flex h-11 items-center gap-2 rounded-md bg-accent px-5 font-mono text-[13px] font-semibold uppercase tracking-[0.04em] text-accent-ink shadow-glow"
+            className="button-primary mt-5"
           >
             Crear mi primera rutina
           </button>

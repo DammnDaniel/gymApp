@@ -19,7 +19,7 @@ export function LogoutButton() {
     <button
       onClick={onClick}
       disabled={loading}
-      className="font-mono text-[11px] uppercase tracking-[0.12em] text-ink-mute transition hover:text-ink disabled:opacity-50"
+      className="min-h-11 border-l border-ink/20 pl-4 font-mono text-[10px] font-semibold uppercase tracking-[0.14em] text-ink-mute transition hover:text-accent-press disabled:opacity-50"
     >
       {loading ? "Saliendo" : "Salir"}
     </button>

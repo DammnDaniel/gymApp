@@ -65,10 +65,10 @@ function EditorBody({ routine }: { routine: RoutineDetail }) {
     "flex h-7 w-7 items-center justify-center rounded-sm border border-border bg-surface-2 font-mono text-sm text-ink-mute transition hover:text-ink disabled:opacity-30";
 
   return (
-    <div className="flex flex-col gap-6">
-      <div className="flex items-center justify-between">
+    <div className="flex flex-col gap-8">
+      <div className="flex min-h-11 items-center justify-between border-b border-ink/20 pb-3">
         <Link href="/routines" className="kicker-accent">
-          &lt; Rutinas
+          ← Volver al plan
         </Link>
         {!routine.is_shared && (
           <button
@@ -81,20 +81,20 @@ function EditorBody({ routine }: { routine: RoutineDetail }) {
                 window.alert("No se pudo borrar la rutina.");
               }
             }}
-            className="font-mono text-[10px] uppercase tracking-[0.1em] text-ink-faint transition hover:text-danger"
+            className="min-h-10 font-mono text-[9px] font-semibold uppercase tracking-[0.12em] text-ink-mute transition hover:text-danger"
           >
             Borrar rutina
           </button>
         )}
       </div>
 
-      <div>
+      <div className="border-b border-ink pb-6">
         {routine.is_shared ? (
           <>
-            <p className="mb-2 inline-flex rounded-full border border-accent/30 bg-accent/10 px-3 py-1 font-mono text-[10px] uppercase tracking-[0.1em] text-accent">
-              Rutina de Elena · solo lectura
+            <p className="mb-4 inline-flex border-l-4 border-signal bg-signal-soft px-3 py-2 font-mono text-[9px] font-semibold uppercase tracking-[0.12em] text-signal">
+              Rutina compartida · solo lectura
             </p>
-            <h1 className="font-display text-2xl font-extrabold leading-tight tracking-tightd text-ink">
+            <h1 className="page-title">
               {routine.name}
             </h1>
             {routine.description && (
@@ -111,7 +111,7 @@ function EditorBody({ routine }: { routine: RoutineDetail }) {
                 if (v && v !== routine.name)
                   rename.mutate({ id: routine.id, name: v });
               }}
-              className="w-full bg-transparent font-display text-2xl font-extrabold leading-tight tracking-tightd text-ink outline-none"
+              className="page-title w-full bg-transparent outline-none focus:shadow-none"
             />
             <input
               value={desc}
@@ -125,18 +125,18 @@ function EditorBody({ routine }: { routine: RoutineDetail }) {
                   });
               }}
               placeholder="Descripción…"
-              className="mt-1 w-full bg-transparent text-sm text-ink-mute outline-none placeholder:text-ink-faint"
+              className="mt-4 w-full max-w-xl border-l-2 border-accent bg-transparent pl-3 text-sm text-ink-mute outline-none placeholder:text-ink-faint"
             />
           </>
         )}
       </div>
 
-      <div className="flex flex-col gap-5">
+      <div className="flex flex-col gap-8">
         {routine.routine_days.map((day, i) => (
           <div key={day.id}>
-            <div className="mb-1.5 flex items-center justify-between">
-              <span className="kicker">
-                // Día {i + 1}
+            <div className="mb-2 flex items-center justify-between">
+              <span className="rule-label">
+                Día {String(i + 1).padStart(2, "0")}
               </span>
               {!routine.is_shared && <div className="flex gap-1.5">
                 <button
@@ -170,7 +170,7 @@ function EditorBody({ routine }: { routine: RoutineDetail }) {
             position: routine.routine_days.length,
           })
         }
-        className="w-full rounded-md border border-dashed border-border-strong py-3 font-mono text-[11px] uppercase tracking-[0.1em] text-ink-mute transition hover:border-accent/40 hover:text-accent"
+        className="button-secondary w-full border-dashed"
       >
         + Añadir día
       </button>}

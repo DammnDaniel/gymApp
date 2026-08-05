@@ -32,13 +32,13 @@ export function ExercisePicker({
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 z-40 bg-bg/95 backdrop-blur-sm">
-      <div className="mx-auto flex h-[100dvh] w-full max-w-2xl flex-col">
-        <div className="flex items-center justify-between border-b border-border px-5 py-3.5">
-          <p className="kicker-accent">// {title}</p>
+    <div className="fixed inset-0 z-40 bg-inverse/70 p-0 backdrop-blur-sm sm:p-4" role="dialog" aria-modal="true" aria-label={title}>
+      <div className="mx-auto flex h-[100dvh] w-full max-w-3xl flex-col border-ink bg-bg sm:h-[calc(100dvh-2rem)] sm:border">
+        <div className="flex items-center justify-between border-b border-ink bg-bg-0 px-5 py-3.5">
+          <p className="kicker-accent">{title}</p>
           <button
             onClick={onClose}
-            className="font-mono text-[11px] uppercase tracking-[0.12em] text-ink-mute transition hover:text-ink"
+            className="min-h-11 border-l border-ink/20 pl-4 font-mono text-[10px] font-semibold uppercase tracking-[0.12em] text-ink-mute transition hover:text-ink"
           >
             Cerrar
           </button>
@@ -57,16 +57,16 @@ export function ExercisePicker({
 
         <div className="flex-1 overflow-y-auto px-5 pb-10">
           {isLoading ? (
-            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+            <div className="grid grid-cols-2 gap-px border border-ink/20 bg-ink/20 sm:grid-cols-3">
               {Array.from({ length: 9 }).map((_, i) => (
                 <div
                   key={i}
-                  className="aspect-[3/4] animate-pulse rounded-lg bg-surface-3"
+                  className="aspect-[3/4] animate-pulse bg-surface-3"
                 />
               ))}
             </div>
           ) : (
-            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+            <div className="grid grid-cols-2 gap-px border border-ink/20 bg-ink/20 sm:grid-cols-3">
               {data?.map((ex) => (
                 <button
                   key={ex.id}
@@ -82,7 +82,7 @@ export function ExercisePicker({
                       setPickingId(null);
                     }
                   }}
-                  className="group flex flex-col overflow-hidden rounded-lg bg-surface text-left shadow-card transition hover:bg-surface-2 disabled:opacity-50"
+                  className="group flex min-h-[220px] flex-col overflow-hidden bg-surface text-left transition hover:bg-bg-0 disabled:opacity-50"
                 >
                   <div className="aspect-square overflow-hidden bg-surface-3">
                     {ex.image_start && (
@@ -95,10 +95,10 @@ export function ExercisePicker({
                     )}
                   </div>
                   <div className="flex flex-col gap-1 p-3">
-                    <div className="line-clamp-2 text-[13px] font-semibold leading-snug text-ink">
+                    <div className="line-clamp-2 font-display text-[15px] font-extrabold leading-[1.05] tracking-[-0.03em] text-ink">
                       {ex.name_es ?? ex.name}
                     </div>
-                    <div className="font-mono text-[10px] uppercase tracking-[0.1em] text-ink-mute">
+                    <div className="mt-auto pt-2 font-mono text-[9px] font-semibold uppercase tracking-[0.12em] text-ink-mute">
                       {pickingId === ex.id
                         ? "Guardando…"
                         : esMuscle(ex.primary_muscles?.[0])}

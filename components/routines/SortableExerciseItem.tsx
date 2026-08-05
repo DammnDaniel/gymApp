@@ -38,7 +38,7 @@ export function SortableExerciseItem({
     <div
       ref={setNodeRef}
       style={{ transform: CSS.Transform.toString(transform), transition }}
-      className={`rounded-md bg-surface-2 p-3 ${
+      className={`border-b border-ink/15 bg-transparent py-3 ${
         isDragging ? "z-10 opacity-60 shadow-hero" : ""
       }`}
     >
@@ -61,7 +61,7 @@ export function SortableExerciseItem({
 
         <Link
           href={href}
-          className="h-12 w-12 shrink-0 overflow-hidden rounded-sm bg-surface-3"
+          className="h-14 w-14 shrink-0 overflow-hidden border border-ink/20 bg-surface-3"
         >
           {re.exercise?.image_start && (
             <img
@@ -77,14 +77,14 @@ export function SortableExerciseItem({
           <div className="flex items-start justify-between gap-2">
             <Link
               href={href}
-              className="line-clamp-2 text-sm font-semibold leading-snug text-ink"
+              className="line-clamp-2 font-display text-[15px] font-extrabold leading-[1.08] tracking-[-0.03em] text-ink"
             >
               {re.exercise?.name_es ?? re.exercise?.name ?? "Ejercicio"}
             </Link>
             {!readOnly && <div className="flex shrink-0 gap-2.5">
               <button
                 onClick={() => setPicker(true)}
-                className="font-mono text-[10px] uppercase tracking-[0.1em] text-ink-faint transition hover:text-accent"
+                className="min-h-8 font-mono text-[9px] font-semibold uppercase tracking-[0.1em] text-ink-mute transition hover:text-signal"
               >
                 Cambiar
               </button>
@@ -92,7 +92,7 @@ export function SortableExerciseItem({
                 onClick={() =>
                   remove.mutate({ routineId, dayId, rowId: re.id })
                 }
-                className="font-mono text-[10px] uppercase tracking-[0.1em] text-ink-faint transition hover:text-danger"
+                className="min-h-8 font-mono text-[9px] font-semibold uppercase tracking-[0.1em] text-ink-mute transition hover:text-danger"
               >
                 Quitar
               </button>
@@ -101,7 +101,7 @@ export function SortableExerciseItem({
         </div>
       </div>
 
-      <div className={`mt-2.5 ${readOnly ? "pl-[58px]" : "pl-[34px]"}`}>
+      <div className={`mt-2.5 ${readOnly ? "pl-[66px]" : "pl-[34px]"}`}>
         {readOnly ? (
           <div className="flex flex-col gap-1">
             <p className="font-mono text-[11px] uppercase tracking-[0.08em] text-ink-mute">{formatTarget(re)}</p>

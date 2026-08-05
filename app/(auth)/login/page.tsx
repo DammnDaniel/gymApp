@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { loginRequest } from "@/lib/auth";
+import { AuthFrame } from "@/components/AuthFrame";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -28,24 +29,15 @@ export default function LoginPage() {
     }
   }
 
-  const inputCls =
-    "h-12 w-full rounded-md border border-border bg-surface-2 px-4 text-[16px] text-ink placeholder:text-ink-faint focus:border-transparent focus:bg-surface-3 focus:outline-none focus:shadow-focusring";
-
   return (
-    <main className="relative mx-auto flex min-h-[100dvh] w-full max-w-sm flex-col justify-center gap-8 overflow-hidden p-6">
-      <div className="pointer-events-none absolute inset-0 bg-[var(--grain)]" />
-
-      <div className="relative">
-        <h1 className="font-display text-[44px] font-extrabold leading-none tracking-tightd">
-          <span className="text-ink">GYM</span>
-          <span className="text-accent">APP</span>
-        </h1>
-        <p className="mt-3 text-ink-mute">Entra para empezar a entrenar.</p>
-      </div>
-
+    <AuthFrame
+      eyebrow="Acceso privado"
+      title={<>Vuelve al<br />trabajo.</>}
+      description="Entra con tu usuario. Tus rutinas, borradores y sesiones siguen exactamente donde los dejaste."
+    >
       <form
         onSubmit={onSubmit}
-        className="relative flex flex-col gap-3 rounded-xl bg-surface p-5 shadow-card"
+        className="flex flex-col gap-5 border-t border-ink pt-6"
       >
         <div>
           <label className="mb-1.5 block font-mono text-[11px] uppercase tracking-kicker text-ink-mute">
@@ -58,7 +50,7 @@ export default function LoginPage() {
             required
             value={username}
             onChange={(e) => setUsername(e.target.value)}
-            className={inputCls}
+            className="field"
           />
         </div>
         <div>
@@ -68,7 +60,7 @@ export default function LoginPage() {
             </label>
             <Link
               href="/forgot-password"
-              className="text-xs font-medium text-accent transition hover:text-accent-press"
+              className="min-h-8 text-xs font-semibold text-signal transition hover:underline"
             >
               La he olvidado
             </Link>
@@ -79,14 +71,14 @@ export default function LoginPage() {
             required
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className={inputCls}
+            className="field"
           />
         </div>
 
         {searchParams.get("passwordUpdated") === "1" && (
           <p
             role="status"
-            className="rounded-md border border-accent/20 bg-accent-soft px-4 py-2.5 text-sm text-ink"
+            className="border-l-4 border-signal bg-signal-soft px-4 py-3 text-sm text-ink"
           >
             Contraseña actualizada. Ya puedes iniciar sesión.
           </p>
@@ -95,7 +87,7 @@ export default function LoginPage() {
         {error && (
           <p
             role="alert"
-            className="rounded-md bg-[rgba(255,93,93,0.1)] px-4 py-2.5 text-sm text-danger"
+            className="border-l-4 border-danger bg-[rgba(199,45,39,0.09)] px-4 py-3 text-sm text-danger"
           >
             {error}
           </p>
@@ -104,11 +96,11 @@ export default function LoginPage() {
         <button
           type="submit"
           disabled={loading}
-          className="mt-2 inline-flex h-12 w-full items-center justify-center gap-2 rounded-md bg-accent px-5 font-mono text-[13px] font-semibold uppercase tracking-[0.04em] text-accent-ink shadow-glow transition active:scale-[0.985] active:bg-accent-press disabled:opacity-45 disabled:shadow-none"
+          className="button-primary mt-1 w-full"
         >
           {loading ? "Entrando" : "Entrar"} <span aria-hidden>→</span>
         </button>
       </form>
-    </main>
+    </AuthFrame>
   );
 }

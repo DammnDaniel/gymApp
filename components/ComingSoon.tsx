@@ -9,7 +9,7 @@ export function ComingSoon({
 }) {
   return (
     <div className="flex min-h-[55vh] flex-col items-start justify-center gap-4">
-      <span className="inline-flex items-center gap-2 rounded-full border border-accent/30 bg-accent-soft px-3 py-1 font-mono text-[10px] font-semibold uppercase tracking-[0.12em] text-accent">
+      <span className="inline-flex items-center gap-2 border border-accent-press/30 bg-accent-soft px-3 py-1 font-mono text-[10px] font-semibold uppercase tracking-[0.12em] text-accent-press">
         Pronto · {phase}
       </span>
       <h1 className="font-display text-3xl font-extrabold leading-none tracking-tightd text-ink">

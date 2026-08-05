@@ -7,7 +7,7 @@ import {
 } from "@/lib/queries/routines";
 
 const numCls =
-  "w-12 rounded-sm border border-border bg-surface-3 px-1 py-1 text-center font-mono text-[13px] tabular-nums text-ink outline-none focus:border-transparent focus:shadow-focusring";
+  "min-h-10 w-12 border border-border bg-bg-0 px-1 py-1 text-center font-mono text-[13px] tabular-nums text-ink outline-none focus:border-signal focus:shadow-focusring";
 
 export function InlineSetsReps({
   routineId,
@@ -81,7 +81,7 @@ export function InlineSetsReps({
         onChange={(e) => setNotes(e.target.value)}
         onBlur={() => save({ notes: notes.trim() === "" ? null : notes.trim() })}
         placeholder="Notas…"
-        className="min-w-0 flex-1 basis-full rounded-sm border border-border bg-surface-3 px-2 py-1 text-[13px] text-ink outline-none placeholder:text-ink-faint focus:border-transparent focus:shadow-focusring"
+        className="min-h-10 min-w-0 flex-1 basis-full border border-border bg-bg-0 px-3 py-2 text-[13px] text-ink outline-none placeholder:text-ink-faint focus:border-signal focus:shadow-focusring"
       />
     </div>
   );

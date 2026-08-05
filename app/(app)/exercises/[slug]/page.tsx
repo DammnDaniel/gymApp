@@ -32,41 +32,42 @@ export default async function ExerciseDetailPage({
   const returnTo = safeReturnPath(searchParams.from);
 
   return (
-    <article className="flex flex-col gap-6">
-      <Link href={returnTo} className="kicker-accent">
-        &lt; {returnLabel(returnTo)}
+    <article className="flex flex-col gap-8">
+      <Link href={returnTo} className="kicker-accent min-h-11 border-b border-ink/20 pb-3">
+        ← {returnLabel(returnTo)}
       </Link>
 
-      <div>
-        <h1 className="font-display text-[26px] font-extrabold leading-tight tracking-tightd text-ink">
-          {title}
-        </h1>
-        {meta && (
-          <p className="mt-1.5 font-mono text-[11px] uppercase tracking-[0.1em] text-ink-mute">
-            {meta}
-          </p>
-        )}
-      </div>
-
-      <ExerciseGif start={ex.image_start} end={ex.image_end} alt={ex.name} />
-
-      <a
+      <div className="grid gap-6 md:grid-cols-[1fr_0.92fr] md:items-end">
+        <div className="order-2 md:order-1">
+          <p className="kicker-accent">Ficha de movimiento</p>
+          <h1 className="mt-3 font-display text-[clamp(2.5rem,9vw,5rem)] font-black leading-[0.86] tracking-[-0.065em] text-ink">
+            {title}
+          </h1>
+          {meta && (
+            <p className="mt-5 border-l-4 border-signal pl-3 font-mono text-[9px] font-semibold uppercase leading-5 tracking-[0.12em] text-ink-mute">
+              {meta}
+            </p>
+          )}
+          <a
         href={`https://www.youtube.com/results?search_query=${encodeURIComponent(
           `${title} técnica`,
         )}`}
         target="_blank"
         rel="noopener noreferrer"
-        className="inline-flex h-11 items-center justify-center gap-2 rounded-md border border-border bg-surface-2 px-5 font-mono text-[12px] font-semibold uppercase tracking-[0.04em] text-ink transition hover:border-border-strong hover:bg-surface-3"
+        className="button-secondary mt-6 w-full sm:w-auto"
       >
-        ▶ Ver técnica en YouTube
-      </a>
+        Ver vídeo de técnica <span aria-hidden>↗</span>
+          </a>
+        </div>
+        <div className="order-1 md:order-2"><ExerciseGif start={ex.image_start} end={ex.image_end} alt={ex.name} /></div>
+      </div>
 
       {(primary.length > 0 || secondary.length > 0) && (
         <div className="flex flex-wrap gap-2">
           {primary.map((m) => (
             <span
               key={`p-${m}`}
-              className="inline-flex items-center rounded-sm border border-accent/30 bg-accent-soft px-3 py-1.5 text-xs font-medium text-accent"
+              className="inline-flex min-h-9 items-center border border-ink bg-accent px-3 text-xs font-semibold text-ink"
             >
               {esMuscle(m)}
             </span>
@@ -74,7 +75,7 @@ export default async function ExerciseDetailPage({
           {secondary.map((m) => (
             <span
               key={`s-${m}`}
-              className="inline-flex items-center rounded-sm border border-border bg-surface-2 px-3 py-1.5 text-xs font-medium text-ink-mute"
+              className="inline-flex min-h-9 items-center border border-border bg-surface px-3 text-xs font-medium text-ink-mute"
             >
               {esMuscle(m)}
             </span>
@@ -83,13 +84,13 @@ export default async function ExerciseDetailPage({
       )}
 
       {instructions.length > 0 && (
-        <section className="flex flex-col gap-3">
-          <h2 className="kicker">// Instrucciones</h2>
-          <ol className="flex flex-col gap-3">
+        <section className="flex flex-col gap-4 border-t border-ink pt-5">
+          <h2 className="rule-label">Ejecución</h2>
+          <ol className="grid gap-x-8 gap-y-5 sm:grid-cols-2">
             {instructions.map((step: string, i: number) => (
-              <li key={i} className="flex gap-3">
-                <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-sm bg-surface-2 font-display text-sm font-extrabold tabular-nums text-accent">
-                  {i + 1}
+              <li key={i} className="grid grid-cols-[32px_1fr] gap-3 border-b border-ink/15 pb-4">
+                <span className="font-mono text-[10px] font-bold tabular-nums text-accent-press">
+                  {String(i + 1).padStart(2, "0")}
                 </span>
                 <span className="pt-0.5 text-[15px] leading-relaxed text-ink">
                   {step}
@@ -101,9 +102,9 @@ export default async function ExerciseDetailPage({
       )}
 
       {ex.tips && (
-        <section className="rounded-md border-l-[3px] border-accent bg-surface-2 p-4">
-          <h2 className="kicker">// Consejos</h2>
-          <p className="mt-1.5 text-[15px] leading-relaxed text-ink">{ex.tips}</p>
+        <section className="border border-ink bg-inverse p-5 text-[var(--inverse-text)]">
+          <h2 className="font-mono text-[10px] font-semibold uppercase tracking-[0.14em] text-accent">Clave técnica</h2>
+          <p className="mt-2 text-[15px] leading-relaxed text-[var(--inverse-text)]">{ex.tips}</p>
         </section>
       )}
     </article>

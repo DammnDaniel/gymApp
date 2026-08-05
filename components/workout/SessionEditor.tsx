@@ -21,7 +21,7 @@ function fmtDate(iso: string) {
 }
 
 const inp =
-  "w-full rounded-sm border border-border bg-surface-3 px-1 py-1.5 text-center font-mono text-[14px] tabular-nums text-ink outline-none focus:border-transparent focus:shadow-focusring";
+  "min-h-10 w-full border border-border bg-bg-0 px-1 py-1.5 text-center font-mono text-[14px] tabular-nums text-ink outline-none focus:border-signal focus:shadow-focusring";
 const head =
   "text-center font-mono text-[10px] uppercase tracking-[0.08em] text-ink-faint";
 
@@ -50,10 +50,10 @@ export function SessionEditor({ id }: { id: string }) {
   }
 
   return (
-    <div className="flex flex-col gap-6">
-      <div className="flex items-center justify-between">
+    <div className="flex flex-col gap-8">
+      <div className="flex min-h-11 items-center justify-between border-b border-ink/20 pb-3">
         <Link href="/history" className="kicker-accent">
-          &lt; Historial
+          ← Volver al diario
         </Link>
         <button
           onClick={async () => {
@@ -66,18 +66,18 @@ export function SessionEditor({ id }: { id: string }) {
               }
             }
           }}
-          className="font-mono text-[10px] uppercase tracking-[0.1em] text-ink-faint transition hover:text-danger"
+          className="min-h-10 font-mono text-[9px] font-semibold uppercase tracking-[0.12em] text-ink-mute transition hover:text-danger"
         >
           Borrar sesión
         </button>
       </div>
 
-      <div>
-        <p className="kicker">// {data.routineName ?? "Sesión"}</p>
-        <h1 className="mt-1 font-display text-2xl font-extrabold tracking-tightd text-ink">
+      <div className="border-b border-ink pb-6">
+        <p className="kicker-accent">{data.routineName ?? "Sesión"}</p>
+        <h1 className="page-title mt-3">
           {data.dayName ?? "Sesión"}
         </h1>
-        <p className="mt-1.5 font-mono text-[10px] uppercase tracking-[0.1em] text-ink-faint">
+        <p className="mt-4 border-l-4 border-signal pl-3 font-mono text-[10px] font-semibold uppercase tracking-[0.1em] text-ink-mute">
           {fmtDate(data.performed_at)}
         </p>
       </div>
@@ -88,9 +88,9 @@ export function SessionEditor({ id }: { id: string }) {
           return (
             <section
               key={ex.exerciseId}
-              className="rounded-lg bg-surface p-4 shadow-card"
+              className="border border-ink bg-surface p-4 shadow-card sm:p-5"
             >
-              <div className="mb-3 font-display text-base font-bold tracking-tightd text-ink">
+              <div className="mb-4 border-b border-ink/20 pb-3 font-display text-lg font-extrabold tracking-[-0.04em] text-ink">
                 {ex.name}
               </div>
               {!isCardio && (
@@ -155,7 +155,7 @@ function EditableSet({
     <button
       onClick={() => delSet.mutate({ sessionId, setId: set.id })}
       aria-label="Borrar serie"
-      className="flex h-8 w-8 items-center justify-center rounded-sm border border-border font-mono text-sm text-ink-faint transition hover:text-danger"
+      className="flex h-10 w-10 items-center justify-center border border-border bg-bg-0 font-mono text-sm text-ink-mute transition hover:border-danger hover:text-danger"
     >
       ×
     </button>
@@ -175,7 +175,7 @@ function EditableSet({
             const m = numI(mins);
             save({ duration_seconds: m != null ? m * 60 : null });
           }}
-          className="w-20 rounded-sm border border-border bg-surface-3 px-2 py-1.5 text-center font-mono text-[14px] tabular-nums text-ink outline-none focus:border-transparent focus:shadow-focusring"
+          className="min-h-10 w-20 border border-border bg-bg-0 px-2 py-1.5 text-center font-mono text-[14px] tabular-nums text-ink outline-none focus:border-signal focus:shadow-focusring"
         />
         <span className="font-mono text-[10px] uppercase tracking-[0.1em] text-ink-mute">
           min

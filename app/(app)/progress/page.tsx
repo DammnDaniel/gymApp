@@ -14,6 +14,7 @@ import {
   useExerciseProgress,
   useExercisesWithLogs,
 } from "@/lib/queries/progress";
+import { PageIntro } from "@/components/PageIntro";
 
 const RANGES = [
   { label: "30d", days: 30 },
@@ -37,9 +38,9 @@ export default function ProgressPage() {
 
   if (!isLoading && exercises && exercises.length === 0) {
     return (
-      <div className="flex flex-col gap-4">
-        <p className="kicker">// Progreso</p>
-        <div className="rounded-lg bg-surface p-6 text-center shadow-card">
+      <div className="flex flex-col gap-8">
+        <PageIntro eyebrow="Rendimiento" title="La señal." description="Tu evolución aparece cuando registras sesiones." />
+        <div className="panel p-8 text-center">
           <p className="text-ink-mute">Aún no hay datos.</p>
           <p className="mt-1 text-sm text-ink-faint">
             Registra una sesión de entreno y tu progreso aparecerá aquí.
@@ -61,14 +62,14 @@ export default function ProgressPage() {
   ];
 
   return (
-    <div className="flex flex-col gap-5">
-      <p className="kicker">// Progreso</p>
+    <div className="flex flex-col gap-8">
+      <PageIntro eyebrow="Rendimiento" title="La señal." description="Compara cargas, volumen y fuerza estimada sin ruido." />
 
-      <div className="flex flex-col gap-2">
+      <div className="panel flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between">
         <select
           value={selected}
           onChange={(e) => setSelected(e.target.value)}
-          className="h-12 rounded-md border border-border bg-surface-2 px-3 text-[16px] text-ink outline-none focus:border-transparent focus:bg-surface-3 focus:shadow-focusring"
+          className="field sm:max-w-md"
         >
           {(exercises ?? []).map((ex) => (
             <option key={ex.exercise_id} value={ex.exercise_id}>
@@ -83,8 +84,8 @@ export default function ProgressPage() {
               onClick={() => setDays(r.days)}
               className={
                 days === r.days
-                  ? "rounded-sm border border-accent/30 bg-accent-soft px-3 py-1.5 font-mono text-xs uppercase tracking-[0.06em] text-accent"
-                  : "rounded-sm border border-border bg-surface-2 px-3 py-1.5 font-mono text-xs uppercase tracking-[0.06em] text-ink-mute"
+                  ? "min-h-10 border border-ink bg-inverse px-3 font-mono text-[10px] font-bold uppercase tracking-[0.08em] text-[var(--inverse-text)]"
+                  : "min-h-10 border border-border bg-bg-0 px-3 font-mono text-[10px] font-semibold uppercase tracking-[0.08em] text-ink-mute"
               }
             >
               {r.label}
@@ -93,11 +94,12 @@ export default function ProgressPage() {
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-        {stats.map((s) => (
-          <div key={s.label} className="rounded-lg bg-surface p-4 shadow-card">
+      <div className="grid grid-cols-2 border-l border-t border-ink sm:grid-cols-4">
+        {stats.map((s, index) => (
+          <div key={s.label} className="relative min-h-[116px] border-b border-r border-ink bg-surface p-4">
+            <span className="absolute right-3 top-3 font-mono text-[8px] font-bold text-accent-press">0{index + 1}</span>
             <div className="flex items-baseline gap-1">
-              <span className="font-display text-2xl font-extrabold tabular-nums text-ink">
+              <span className="font-display text-3xl font-black tabular-nums tracking-[-0.05em] text-ink">
                 {s.value}
               </span>
               {s.unit && (
@@ -106,32 +108,32 @@ export default function ProgressPage() {
                 </span>
               )}
             </div>
-            <div className="mt-1 font-mono text-[10px] uppercase tracking-[0.1em] text-ink-mute">
+            <div className="mt-3 font-mono text-[9px] font-semibold uppercase tracking-[0.12em] text-ink-mute">
               {s.label}
             </div>
           </div>
         ))}
       </div>
 
-      <div className="rounded-lg bg-surface p-4 shadow-card">
-        <p className="mb-3 kicker">// e1RM estimado</p>
+      <div className="panel p-4 sm:p-6">
+        <p className="mb-5 rule-label">e1RM estimado</p>
         {mounted && prog && prog.points.length > 1 ? (
           <ResponsiveContainer width="100%" height={220}>
             <LineChart
               data={prog.points}
               margin={{ top: 5, right: 8, bottom: 0, left: -16 }}
             >
-              <CartesianGrid stroke="#262A30" vertical={false} />
+              <CartesianGrid stroke="#c4c7bd" vertical={false} />
               <XAxis
                 dataKey="day"
                 tickFormatter={(d: string) => `${d.slice(8, 10)}/${d.slice(5, 7)}`}
-                stroke="#5B6068"
+                stroke="#535c58"
                 fontSize={10}
                 tickLine={false}
-                axisLine={{ stroke: "#262A30" }}
+                axisLine={{ stroke: "#c4c7bd" }}
               />
               <YAxis
-                stroke="#5B6068"
+                stroke="#535c58"
                 fontSize={10}
                 width={40}
                 tickLine={false}
@@ -139,21 +141,21 @@ export default function ProgressPage() {
               />
               <Tooltip
                 contentStyle={{
-                  background: "#1B1E22",
-                  border: "1px solid #262A30",
-                  borderRadius: 10,
+                  background: "#151b1a",
+                  border: "1px solid #151b1a",
+                  borderRadius: 0,
                   fontSize: 12,
                 }}
-                labelStyle={{ color: "#9AA0A6" }}
-                itemStyle={{ color: "#D8FF3E" }}
+                labelStyle={{ color: "#b9c0bc" }}
+                itemStyle={{ color: "#ff6138" }}
                 formatter={(v: number) => [`${v} kg`, "e1RM"]}
               />
               <Line
                 type="monotone"
                 dataKey="e1rm"
-                stroke="#D8FF3E"
-                strokeWidth={2}
-                dot={{ r: 3, fill: "#D8FF3E", strokeWidth: 0 }}
+                stroke="#ff6138"
+                strokeWidth={3}
+                dot={{ r: 3, fill: "#ff6138", strokeWidth: 0 }}
                 activeDot={{ r: 5 }}
               />
             </LineChart>

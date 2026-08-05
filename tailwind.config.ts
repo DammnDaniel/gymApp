@@ -33,13 +33,21 @@ const config: Config = {
           ink: "var(--accent-ink)",
         },
         danger: "var(--danger)",
+        signal: {
+          DEFAULT: "var(--signal)",
+          soft: "var(--signal-soft)",
+        },
+        inverse: {
+          DEFAULT: "var(--inverse)",
+          text: "var(--inverse-text)",
+        },
       },
       fontFamily: {
         display: ["var(--font-display)", ...defaultTheme.fontFamily.sans],
         sans: ["var(--font-sans)", ...defaultTheme.fontFamily.sans],
         mono: ["var(--font-mono)", ...defaultTheme.fontFamily.mono],
       },
-      borderRadius: { sm: "10px", md: "16px", lg: "22px", xl: "28px" },
+      borderRadius: { sm: "4px", md: "8px", lg: "14px", xl: "20px" },
       boxShadow: {
         card: "var(--shadow-card)",
         hero: "var(--shadow-hero)",
