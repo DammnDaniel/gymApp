@@ -1,70 +1,38 @@
-// Service worker mínimo para GymApp: instalable + caché básica offline.
-const CACHE = "gymapp-v1";
+// Cache only public immutable assets. Authenticated HTML and API responses must
+// never be reused for a different account on a shared device.
+const CACHE = "gymapp-static-v3";
 
-self.addEventListener("install", () => {
-  self.skipWaiting();
-});
+self.addEventListener("install", () => self.skipWaiting());
 
 self.addEventListener("activate", (event) => {
   event.waitUntil(
     (async () => {
       const keys = await caches.keys();
-      await Promise.all(keys.filter((k) => k !== CACHE).map((k) => caches.delete(k)));
+      await Promise.all(keys.filter((key) => key !== CACHE).map((key) => caches.delete(key)));
       await self.clients.claim();
     })(),
   );
 });
 
 self.addEventListener("fetch", (event) => {
-  const req = event.request;
-  if (req.method !== "GET") return;
+  const request = event.request;
+  if (request.method !== "GET") return;
 
-  let url;
-  try {
-    url = new URL(req.url);
-  } catch {
-    return;
-  }
+  const url = new URL(request.url);
+  const isExerciseImage = url.hostname.endsWith("githubusercontent.com");
+  const isStaticAsset =
+    url.origin === self.location.origin &&
+    (url.pathname.startsWith("/_next/static/") || url.pathname.startsWith("/icons/"));
 
-  // Imágenes de ejercicios (GitHub raw): cache-first, persistente.
-  if (url.hostname.endsWith("githubusercontent.com")) {
-    event.respondWith(
-      caches.open(CACHE).then(async (cache) => {
-        const hit = await cache.match(req);
-        if (hit) return hit;
-        try {
-          const res = await fetch(req);
-          if (res.ok) cache.put(req, res.clone());
-          return res;
-        } catch {
-          return hit ?? Response.error();
-        }
-      }),
-    );
-    return;
-  }
+  if (!isExerciseImage && !isStaticAsset) return;
 
-  // Mismo origen (shell, assets): network-first con fallback a caché.
-  if (url.origin === self.location.origin) {
-    event.respondWith(
-      (async () => {
-        try {
-          const res = await fetch(req);
-          if (res.ok && (req.mode === "navigate" || url.pathname.startsWith("/_next/"))) {
-            const cache = await caches.open(CACHE);
-            cache.put(req, res.clone());
-          }
-          return res;
-        } catch {
-          const cached = await caches.match(req);
-          if (cached) return cached;
-          if (req.mode === "navigate") {
-            const dash = await caches.match("/dashboard");
-            if (dash) return dash;
-          }
-          return Response.error();
-        }
-      })(),
-    );
-  }
+  event.respondWith(
+    caches.open(CACHE).then(async (cache) => {
+      const cached = await cache.match(request);
+      if (cached) return cached;
+      const response = await fetch(request);
+      if (response.ok) await cache.put(request, response.clone());
+      return response;
+    }),
+  );
 });

@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   useCreateDay,
   useDeleteRoutine,
@@ -50,6 +50,9 @@ function EditorBody({ routine }: { routine: RoutineDetail }) {
   const [name, setName] = useState(routine.name);
   const [desc, setDesc] = useState(routine.description ?? "");
 
+  useEffect(() => setName(routine.name), [routine.name]);
+  useEffect(() => setDesc(routine.description ?? ""), [routine.description]);
+
   function moveDay(index: number, dir: -1 | 1) {
     const ids = routine.routine_days.map((d) => d.id);
     const target = index + dir;
@@ -67,44 +70,65 @@ function EditorBody({ routine }: { routine: RoutineDetail }) {
         <Link href="/routines" className="kicker-accent">
           &lt; Rutinas
         </Link>
-        <button
-          onClick={() => {
-            if (window.confirm("¿Borrar esta rutina entera?")) {
-              deleteRoutine.mutate(routine.id);
-              router.replace("/routines");
-            }
-          }}
-          className="font-mono text-[10px] uppercase tracking-[0.1em] text-ink-faint transition hover:text-danger"
-        >
-          Borrar rutina
-        </button>
+        {!routine.is_shared && (
+          <button
+            onClick={async () => {
+              if (!window.confirm("¿Borrar esta rutina entera?")) return;
+              try {
+                await deleteRoutine.mutateAsync(routine.id);
+                router.replace("/routines");
+              } catch {
+                window.alert("No se pudo borrar la rutina.");
+              }
+            }}
+            className="font-mono text-[10px] uppercase tracking-[0.1em] text-ink-faint transition hover:text-danger"
+          >
+            Borrar rutina
+          </button>
+        )}
       </div>
 
       <div>
-        <input
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          onBlur={() => {
-            const v = name.trim();
-            if (v && v !== routine.name)
-              rename.mutate({ id: routine.id, name: v });
-          }}
-          className="w-full bg-transparent font-display text-2xl font-extrabold leading-tight tracking-tightd text-ink outline-none"
-        />
-        <input
-          value={desc}
-          onChange={(e) => setDesc(e.target.value)}
-          onBlur={() => {
-            if (desc !== (routine.description ?? ""))
-              rename.mutate({
-                id: routine.id,
-                name: name.trim() || routine.name,
-                description: desc.trim() || null,
-              });
-          }}
-          placeholder="Descripción…"
-          className="mt-1 w-full bg-transparent text-sm text-ink-mute outline-none placeholder:text-ink-faint"
-        />
+        {routine.is_shared ? (
+          <>
+            <p className="mb-2 inline-flex rounded-full border border-accent/30 bg-accent/10 px-3 py-1 font-mono text-[10px] uppercase tracking-[0.1em] text-accent">
+              Rutina de Elena · solo lectura
+            </p>
+            <h1 className="font-display text-2xl font-extrabold leading-tight tracking-tightd text-ink">
+              {routine.name}
+            </h1>
+            {routine.description && (
+              <p className="mt-1 text-sm text-ink-mute">{routine.description}</p>
+            )}
+          </>
+        ) : (
+          <>
+            <input
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              onBlur={() => {
+                const v = name.trim();
+                if (v && v !== routine.name)
+                  rename.mutate({ id: routine.id, name: v });
+              }}
+              className="w-full bg-transparent font-display text-2xl font-extrabold leading-tight tracking-tightd text-ink outline-none"
+            />
+            <input
+              value={desc}
+              onChange={(e) => setDesc(e.target.value)}
+              onBlur={() => {
+                if (desc !== (routine.description ?? ""))
+                  rename.mutate({
+                    id: routine.id,
+                    name: name.trim() || routine.name,
+                    description: desc.trim() || null,
+                  });
+              }}
+              placeholder="Descripción…"
+              className="mt-1 w-full bg-transparent text-sm text-ink-mute outline-none placeholder:text-ink-faint"
+            />
+          </>
+        )}
       </div>
 
       <div className="flex flex-col gap-5">
@@ -114,7 +138,7 @@ function EditorBody({ routine }: { routine: RoutineDetail }) {
               <span className="kicker">
                 // Día {i + 1}
               </span>
-              <div className="flex gap-1.5">
+              {!routine.is_shared && <div className="flex gap-1.5">
                 <button
                   onClick={() => moveDay(i, -1)}
                   disabled={i === 0}
@@ -131,14 +155,14 @@ function EditorBody({ routine }: { routine: RoutineDetail }) {
                 >
                   ↓
                 </button>
-              </div>
+              </div>}
             </div>
-            <DaySection routineId={routine.id} day={day} />
+            <DaySection routineId={routine.id} day={day} readOnly={routine.is_shared} />
           </div>
         ))}
       </div>
 
-      <button
+      {!routine.is_shared && <button
         onClick={() =>
           createDay.mutate({
             routineId: routine.id,
@@ -149,7 +173,7 @@ function EditorBody({ routine }: { routine: RoutineDetail }) {
         className="w-full rounded-md border border-dashed border-border-strong py-3 font-mono text-[11px] uppercase tracking-[0.1em] text-ink-mute transition hover:border-accent/40 hover:text-accent"
       >
         + Añadir día
-      </button>
+      </button>}
     </div>
   );
 }

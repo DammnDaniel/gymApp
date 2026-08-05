@@ -65,8 +65,13 @@ export default function HistoryPage() {
                 </div>
               </Link>
               <button
-                onClick={() => {
-                  if (window.confirm("¿Borrar esta sesión?")) del.mutate(s.id);
+                onClick={async () => {
+                  if (!window.confirm("¿Borrar esta sesión?")) return;
+                  try {
+                    await del.mutateAsync(s.id);
+                  } catch {
+                    window.alert("No se pudo borrar la sesión.");
+                  }
                 }}
                 className="shrink-0 font-mono text-[10px] uppercase tracking-[0.1em] text-ink-faint transition hover:text-danger"
               >

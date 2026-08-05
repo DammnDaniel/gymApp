@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import type { WorkoutExercise } from "@/lib/queries/workouts";
+import { exerciseDetailHref } from "@/lib/navigation";
 
 export type SetRow = {
   weight: string;
@@ -21,10 +22,12 @@ export function ExerciseLogger({
   ex,
   rows,
   onChange,
+  returnTo,
 }: {
   ex: WorkoutExercise;
   rows: SetRow[];
   onChange: (rows: SetRow[]) => void;
+  returnTo: string;
 }) {
   const name = ex.name_es ?? ex.name;
   const isCardio = ex.category === "cardio";
@@ -44,7 +47,7 @@ export function ExerciseLogger({
   const Header = (
     <div className="mb-3 flex items-center gap-3">
       <Link
-        href={ex.slug ? `/exercises/${encodeURIComponent(ex.slug)}` : "#"}
+        href={ex.slug ? exerciseDetailHref(ex.slug, returnTo) : "#"}
         className="h-11 w-11 shrink-0 overflow-hidden rounded-sm bg-surface-3"
       >
         {ex.image_start && (

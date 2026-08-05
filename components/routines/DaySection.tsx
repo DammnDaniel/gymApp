@@ -33,9 +33,11 @@ import { ExercisePicker } from "./ExercisePicker";
 export function DaySection({
   routineId,
   day,
+  readOnly = false,
 }: {
   routineId: string;
   day: RoutineDay;
+  readOnly?: boolean;
 }) {
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
@@ -50,6 +52,9 @@ export function DaySection({
   const [picker, setPicker] = useState(false);
   const [activeId, setActiveId] = useState<string | null>(null);
 
+  useEffect(() => setName(day.name), [day.name]);
+  useEffect(() => setFocus(day.focus ?? ""), [day.focus]);
+
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
     useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
@@ -59,6 +64,7 @@ export function DaySection({
   const activeRe = day.routine_exercises.find((re) => re.id === activeId);
 
   function onDragEnd(e: DragEndEvent) {
+    if (readOnly) return;
     setActiveId(null);
     const { active, over } = e;
     if (!over || active.id === over.id) return;
@@ -76,7 +82,10 @@ export function DaySection({
     <section className="rounded-lg bg-surface p-4 shadow-card">
       <div className="mb-3 flex items-start justify-between gap-2">
         <div className="min-w-0 flex-1">
-          <input
+          {readOnly ? <>
+            <h2 className="font-display text-lg font-extrabold tracking-tightd text-ink">{day.name}</h2>
+            {day.focus && <p className="mt-0.5 font-mono text-[11px] uppercase tracking-[0.1em] text-ink-mute">{day.focus}</p>}
+          </> : <><input
             value={name}
             onChange={(e) => setName(e.target.value)}
             onBlur={() => {
@@ -100,9 +109,9 @@ export function DaySection({
             }}
             placeholder="Enfoque (opcional)"
             className="mt-0.5 w-full bg-transparent font-mono text-[11px] uppercase tracking-[0.1em] text-ink-mute outline-none placeholder:text-ink-faint"
-          />
+          /></>}
         </div>
-        <div className="flex shrink-0 flex-col items-end gap-1.5">
+        {!readOnly && <div className="flex shrink-0 flex-col items-end gap-1.5">
           <Link
             href={`/workout/${day.id}`}
             className="inline-flex h-8 items-center gap-1 rounded-sm bg-accent px-3 font-mono text-[11px] font-semibold uppercase tracking-[0.04em] text-accent-ink shadow-glow transition active:scale-[0.97]"
@@ -110,15 +119,19 @@ export function DaySection({
             ▶ Entrenar
           </Link>
           <button
-            onClick={() => {
-              if (window.confirm("¿Borrar este día?"))
-                deleteDay.mutate({ routineId, dayId: day.id });
+            onClick={async () => {
+              if (!window.confirm("¿Borrar este día?")) return;
+              try {
+                await deleteDay.mutateAsync({ routineId, dayId: day.id });
+              } catch {
+                window.alert("No se pudo borrar el día.");
+              }
             }}
             className="font-mono text-[10px] uppercase tracking-[0.1em] text-ink-faint transition hover:text-danger"
           >
             Borrar
           </button>
-        </div>
+        </div>}
       </div>
 
       {day.routine_exercises.length === 0 ? (
@@ -141,6 +154,7 @@ export function DaySection({
                   routineId={routineId}
                   dayId={day.id}
                   re={re}
+                  readOnly={readOnly}
                 />
               ))}
             </div>
@@ -159,26 +173,26 @@ export function DaySection({
         </DndContext>
       )}
 
-      <button
+      {!readOnly && <button
         onClick={() => setPicker(true)}
         className="mt-3 w-full rounded-md border border-dashed border-border-strong py-2.5 font-mono text-[11px] uppercase tracking-[0.1em] text-ink-mute transition hover:border-accent/40 hover:text-accent"
       >
         + Añadir ejercicio
-      </button>
+      </button>}
 
-      <ExercisePicker
+      {!readOnly && <ExercisePicker
         open={picker}
         title="Añadir ejercicio"
         onClose={() => setPicker(false)}
         onPick={(exerciseId) =>
-          addExercise.mutate({
+          addExercise.mutateAsync({
             routineId,
             dayId: day.id,
             exerciseId,
             position: day.routine_exercises.length,
           })
         }
-      />
+      />}
     </section>
   );
 }

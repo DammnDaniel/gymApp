@@ -56,10 +56,14 @@ export function SessionEditor({ id }: { id: string }) {
           &lt; Historial
         </Link>
         <button
-          onClick={() => {
+          onClick={async () => {
             if (window.confirm("¿Borrar esta sesión entera?")) {
-              delSession.mutate(data.id);
-              router.replace("/history");
+              try {
+                await delSession.mutateAsync(data.id);
+                router.replace("/history");
+              } catch {
+                window.alert("No se pudo borrar la sesión.");
+              }
             }
           }}
           className="font-mono text-[10px] uppercase tracking-[0.1em] text-ink-faint transition hover:text-danger"

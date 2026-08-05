@@ -16,9 +16,9 @@ export default async function AppLayout({
   if (!user) redirect("/login");
 
   return (
-    <div className="mx-auto flex min-h-[100dvh] w-full max-w-2xl flex-col">
-      <header className="sticky top-0 z-20 flex items-center justify-between border-b border-border bg-bg/80 px-5 py-3.5 backdrop-blur-xl">
-        <Link href="/dashboard" className="flex items-center">
+    <div className="mx-auto flex min-h-[100dvh] w-full max-w-3xl flex-col">
+      <header className="sticky top-0 z-20 mx-3 mt-2 flex items-center justify-between rounded-2xl border border-white/[0.06] bg-bg/75 px-4 py-3 backdrop-blur-2xl sm:mx-5">
+        <Link href="/dashboard" className="flex items-center" aria-label="GymApp · inicio">
           <span className="font-display text-lg font-extrabold tracking-tightd">
             <span className="text-ink">GYM</span>
             <span className="text-accent">APP</span>
@@ -27,7 +27,7 @@ export default async function AppLayout({
         <LogoutButton />
       </header>
 
-      <main className="flex-1 px-5 py-6 pb-32">{children}</main>
+      <main className="flex-1 px-4 py-7 pb-32 sm:px-6 sm:py-9">{children}</main>
 
       <BottomNav />
     </div>

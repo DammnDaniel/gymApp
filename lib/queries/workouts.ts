@@ -141,31 +141,22 @@ export function useSaveWorkout() {
       } = await supabase.auth.getUser();
       if (!user) throw new Error("Sesión expirada");
 
-      const sessionId = crypto.randomUUID();
-      const { error: sErr } = await supabase.from("workout_sessions").insert({
-        id: sessionId,
-        owner_id: user.id,
-        routine_day_id: input.dayId,
-        duration_seconds: input.durationSeconds,
+      const rows = input.sets.map((s) => ({
+        exercise_id: s.exerciseId,
+        set_number: s.set_number,
+        weight_kg: s.weight_kg,
+        reps: s.reps,
+        rpe: s.rpe,
+        duration_seconds: s.duration_seconds,
+        is_warmup: s.is_warmup,
+      }));
+      const { data, error } = await supabase.rpc("save_workout_session", {
+        p_day_id: input.dayId,
+        p_duration_seconds: input.durationSeconds,
+        p_sets: rows,
       });
-      if (sErr) throw sErr;
-
-      if (input.sets.length) {
-        const rows = input.sets.map((s) => ({
-          id: crypto.randomUUID(),
-          session_id: sessionId,
-          exercise_id: s.exerciseId,
-          set_number: s.set_number,
-          weight_kg: s.weight_kg,
-          reps: s.reps,
-          rpe: s.rpe,
-          duration_seconds: s.duration_seconds,
-          is_warmup: s.is_warmup,
-        }));
-        const { error: lErr } = await supabase.from("set_logs").insert(rows);
-        if (lErr) throw lErr;
-      }
-      return { sessionId, count: input.sets.length };
+      if (error) throw error;
+      return { sessionId: String(data), count: input.sets.length };
     },
     onSettled: () => qc.invalidateQueries({ queryKey: workoutKeys.all }),
   });
@@ -312,6 +303,18 @@ export function useUpdateSetLog() {
         Pick<SessionSetRow, "weight_kg" | "reps" | "rpe" | "duration_seconds">
       >;
     }) => {
+      const { weight_kg, reps, rpe, duration_seconds } = input.patch;
+      if (weight_kg != null && (weight_kg < 0 || weight_kg > 1000))
+        throw new Error("Peso no válido");
+      if (reps != null && (reps < 0 || reps > 1000))
+        throw new Error("Repeticiones no válidas");
+      if (rpe != null && (rpe < 0 || rpe > 10))
+        throw new Error("RPE no válido");
+      if (
+        duration_seconds != null &&
+        (duration_seconds < 1 || duration_seconds > 86400)
+      )
+        throw new Error("Duración no válida");
       const supabase = createClient();
       const { error } = await supabase
         .from("set_logs")

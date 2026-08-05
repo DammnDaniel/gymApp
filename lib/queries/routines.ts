@@ -9,11 +9,13 @@ import { createClient } from "@/lib/supabase/client";
 // ─── Tipos ──────────────────────────────────────────────────────────
 export type RoutineListItem = {
   id: string;
+  owner_id: string;
   name: string;
   description: string | null;
   is_active: boolean;
   created_at: string;
   day_count: number;
+  is_shared: boolean;
 };
 
 export type RoutineExerciseCatalog = {
@@ -52,6 +54,7 @@ export type RoutineDetail = {
   name: string;
   description: string | null;
   is_active: boolean;
+  is_shared: boolean;
   routine_days: RoutineDay[];
 };
 
@@ -68,19 +71,26 @@ export function useRoutines() {
     queryKey: routineKeys.lists(),
     queryFn: async (): Promise<RoutineListItem[]> => {
       const supabase = createClient();
+      const {
+        data: { user },
+        error: authError,
+      } = await supabase.auth.getUser();
+      if (authError || !user) throw authError ?? new Error("Sesión expirada");
       const { data, error } = await supabase
         .from("routines")
-        .select("id, name, description, is_active, created_at, routine_days(count)")
+        .select("id, owner_id, name, description, is_active, created_at, routine_days(count)")
         .order("created_at", { ascending: true });
       if (error) throw error;
       return (data ?? []).map((r: any) => ({
         id: r.id,
+        owner_id: r.owner_id,
         name: r.name,
         description: r.description,
         is_active: r.is_active,
         created_at: r.created_at,
         day_count: r.routine_days?.[0]?.count ?? 0,
-      }));
+        is_shared: r.owner_id !== user.id,
+      })).sort((a, b) => Number(a.is_shared) - Number(b.is_shared));
     },
   });
 }
@@ -91,6 +101,11 @@ export function useRoutine(id: string) {
     enabled: !!id,
     queryFn: async (): Promise<RoutineDetail | null> => {
       const supabase = createClient();
+      const {
+        data: { user },
+        error: authError,
+      } = await supabase.auth.getUser();
+      if (authError || !user) throw authError ?? new Error("Sesión expirada");
       const { data, error } = await supabase
         .from("routines")
         .select(
@@ -119,7 +134,11 @@ export function useRoutine(id: string) {
           (a: RoutineExercise, b: RoutineExercise) => a.position - b.position,
         );
       }
-      return { ...raw, routine_days: days } as RoutineDetail;
+      return {
+        ...raw,
+        is_shared: raw.owner_id !== user.id,
+        routine_days: days,
+      } as RoutineDetail;
     },
   });
 }
