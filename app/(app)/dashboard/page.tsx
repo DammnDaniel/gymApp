@@ -85,6 +85,26 @@ export default async function DashboardPage() {
         </div>
       </Link>
 
+      <Link
+        href="/coach"
+        className="group grid gap-4 border border-ink bg-surface p-5 shadow-card transition hover:-translate-y-0.5 hover:bg-white sm:grid-cols-[auto_1fr_auto] sm:items-center"
+      >
+        <span className="flex h-12 w-12 items-center justify-center bg-signal font-display text-xl font-black text-white">
+          C
+        </span>
+        <div>
+          <p className="font-mono text-[9px] font-bold uppercase tracking-[0.14em] text-signal">
+            Coach contextual
+          </p>
+          <h2 className="mt-1 font-display text-xl font-black tracking-[-0.04em] text-ink">
+            Pregunta sobre tu rutina. Cambia solo lo que confirmes.
+          </h2>
+        </div>
+        <span className="font-mono text-xl text-ink transition group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-accent-press">
+          ↗
+        </span>
+      </Link>
+
       <div>
         <div className="mb-4 flex items-baseline justify-between border-b border-ink/20 pb-3">
           <span className="rule-label">Índice</span>
