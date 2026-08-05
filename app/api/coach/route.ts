@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import OpenAI from "openai";
-import type { ResponseInput } from "openai/resources/responses/responses";
+import type { ChatCompletionMessageParam } from "openai/resources/chat/completions";
 import { createClient } from "@/lib/supabase/server";
 import { createCoachAI } from "@/lib/coach/ai";
 import { buildCoachInstructions } from "@/lib/coach/prompt";
@@ -24,16 +24,24 @@ export const runtime = "nodejs";
 export const maxDuration = 60;
 
 const MAX_MESSAGE_LENGTH = 2400;
+const MAX_MESSAGES_PER_MINUTE = 6;
+const MAX_MESSAGES_PER_DAY = 30;
 
 function asErrorMessage(error: unknown) {
   if (error instanceof OpenAI.APIError) {
-    if (error.status === 401) return "La conexión segura del Coach no ha podido autenticarse.";
+    if (error.status === 401)
+      return "La clave gratuita de Gemini no es válida o ha caducado.";
     if (error.status === 429)
-      return "El asistente ha alcanzado temporalmente su límite. Inténtalo en unos minutos.";
-    return "OpenAI no ha podido completar la respuesta.";
+      return "Se ha alcanzado la cuota gratuita de Gemini. No se ha generado ningún cargo; inténtalo más tarde.";
+    return "Gemini no ha podido completar la respuesta.";
   }
   if (error instanceof Error) return error.message;
   return "No se ha podido completar la consulta.";
+}
+
+function asErrorStatus(error: unknown) {
+  if (error instanceof OpenAI.APIError && error.status === 429) return 429;
+  return 500;
 }
 
 async function requireUser() {
@@ -130,9 +138,15 @@ export async function POST(request: Request) {
       .eq("role", "user")
       .gte("created_at", dayAgo),
   ]);
-  if ((minuteCount ?? 0) >= 8 || (dayCount ?? 0) >= 100) {
+  if ((minuteCount ?? 0) >= MAX_MESSAGES_PER_MINUTE) {
     return NextResponse.json(
       { error: "Has enviado demasiados mensajes seguidos. Espera un poco antes de continuar." },
+      { status: 429 },
+    );
+  }
+  if ((dayCount ?? 0) >= MAX_MESSAGES_PER_DAY) {
+    return NextResponse.json(
+      { error: "Has alcanzado el límite gratuito diario del Coach. Podrás continuar mañana." },
       { status: 429 },
     );
   }
@@ -201,48 +215,50 @@ export async function POST(request: Request) {
       routines,
       memories,
     });
-    const { client: openai, model, provider } = ai;
-    const input: ResponseInput = history.map((item: any) => ({
-      role: item.role,
-      content: item.content,
-    }));
+    const { client: gemini, model, provider } = ai;
+    const messages: ChatCompletionMessageParam[] = [
+      { role: "system", content: instructions },
+      ...history.map((item: any) => ({
+        role: item.role as "user" | "assistant",
+        content: item.content,
+      })),
+    ];
 
     let createdProposal: CoachProposal | null = null;
-    let response = await openai.responses.create({
+    let response = await gemini.chat.completions.create({
       model,
-      instructions,
-      input,
+      messages,
       tools: coachTools,
       tool_choice: "auto",
-      reasoning: { effort: "low" },
-      max_output_tokens: 1600,
-      store: false,
+      reasoning_effort: "low",
+      max_completion_tokens: 1600,
     });
 
     for (let round = 0; round < 5; round += 1) {
-      const calls = response.output.filter((item) => item.type === "function_call");
+      const assistant = response.choices[0]?.message;
+      const calls = assistant?.tool_calls ?? [];
       if (!calls.length) break;
 
-      // La API acepta sus propios items de salida como entrada de la siguiente
-      // ronda; el SDK 7.4 mantiene una unión ligeramente más amplia en output.
-      input.push(...(response.output as unknown as ResponseInput));
+      messages.push(assistant);
       for (const call of calls) {
         let result: unknown;
         try {
-          const args = JSON.parse(call.arguments);
-          if (call.name === "get_routine_details") {
+          if (call.type !== "function") throw new Error("Herramienta no admitida");
+          const args = JSON.parse(call.function.arguments);
+          const toolName = call.function.name;
+          if (toolName === "get_routine_details") {
             const routine = await getRoutineDetails(supabase, args.routine_id);
             result = routine ?? { error: "Rutina no encontrada o no visible" };
-          } else if (call.name === "search_exercises") {
+          } else if (toolName === "search_exercises") {
             result = await searchExercises(supabase, args);
-          } else if (call.name === "get_training_history") {
+          } else if (toolName === "get_training_history") {
             result = await getTrainingHistory(supabase, user.id, args);
-          } else if (call.name === "remember_training_context") {
+          } else if (toolName === "remember_training_context") {
             result = await rememberTrainingContext(supabase, user.id, {
               category: args.category as CoachMemory["category"],
               content: args.content,
             });
-          } else if (call.name === "propose_routine_change") {
+          } else if (toolName === "propose_routine_change") {
             if (createdProposal) {
               result = {
                 error: "Ya se creó una propuesta en esta respuesta. Explica esa propuesta.",
@@ -270,49 +286,50 @@ export async function POST(request: Request) {
           result = { error: asErrorMessage(toolError) };
         }
 
-        input.push({
-          type: "function_call_output",
-          call_id: call.call_id,
-          output: JSON.stringify(result),
+        messages.push({
+          role: "tool",
+          tool_call_id: call.id,
+          content: JSON.stringify(result),
         });
       }
 
-      response = await openai.responses.create({
+      response = await gemini.chat.completions.create({
         model,
-        instructions,
-        input,
+        messages,
         tools: coachTools,
         tool_choice: "auto",
-        reasoning: { effort: "low" },
-        max_output_tokens: 1600,
-        store: false,
+        reasoning_effort: "low",
+        max_completion_tokens: 1600,
       });
     }
 
-    const unresolvedCalls = response.output.filter((item) => item.type === "function_call");
+    const unresolvedAssistant = response.choices[0]?.message;
+    const unresolvedCalls = unresolvedAssistant?.tool_calls ?? [];
     if (unresolvedCalls.length) {
-      input.push(...(response.output as unknown as ResponseInput));
+      messages.push(unresolvedAssistant);
       for (const call of unresolvedCalls) {
-        input.push({
-          type: "function_call_output",
-          call_id: call.call_id,
-          output: JSON.stringify({
+        messages.push({
+          role: "tool",
+          tool_call_id: call.id,
+          content: JSON.stringify({
             error: "Límite interno de consultas alcanzado. Resume lo comprobado sin inventar datos.",
           }),
         });
       }
-      response = await openai.responses.create({
+      messages.push({
+        role: "system",
+        content: "Finaliza ahora con una respuesta útil y breve. No solicites más herramientas.",
+      });
+      response = await gemini.chat.completions.create({
         model,
-        instructions: `${instructions}\nFinaliza ahora con una respuesta útil y breve. No solicites más herramientas.`,
-        input,
-        reasoning: { effort: "low" },
-        max_output_tokens: 1600,
-        store: false,
+        messages,
+        reasoning_effort: "low",
+        max_completion_tokens: 1600,
       });
     }
 
     const answer =
-      response.output_text.trim() ||
+      response.choices[0]?.message.content?.trim() ||
       "No he podido construir una respuesta fiable con los datos disponibles.";
     const { data: assistantMessage, error: assistantError } = await supabase
       .from("coach_messages")
@@ -345,7 +362,7 @@ export async function POST(request: Request) {
         thread,
         message: storedUserMessage,
       },
-      { status: 500 },
+      { status: asErrorStatus(error) },
     );
   }
 }
