@@ -132,6 +132,10 @@ function SessionBody({ day }: { day: WorkoutDay }) {
         const r = rows[0];
         if (r && (r.done || r.minutes !== "")) {
           const mins = parseInt(r.minutes, 10);
+          if (!Number.isFinite(mins) || mins < 1 || mins > 1440) {
+            window.alert("La duración de cardio debe estar entre 1 y 1440 minutos.");
+            return;
+          }
           sets.push({
             exerciseId: ex.exerciseId,
             set_number: 1,
@@ -150,6 +154,18 @@ function SessionBody({ day }: { day: WorkoutDay }) {
         const w = parseFloat(r.weight.replace(",", "."));
         const reps = parseInt(r.reps, 10);
         const rpe = parseFloat(r.rpe.replace(",", "."));
+        if (Number.isFinite(w) && (w < 0 || w > 1000)) {
+          window.alert("Revisa el peso: debe estar entre 0 y 1000 kg.");
+          return;
+        }
+        if (Number.isFinite(reps) && (reps < 0 || reps > 1000)) {
+          window.alert("Revisa las repeticiones.");
+          return;
+        }
+        if (Number.isFinite(rpe) && (rpe < 0 || rpe > 10)) {
+          window.alert("El RPE debe estar entre 0 y 10.");
+          return;
+        }
         sets.push({
           exerciseId: ex.exerciseId,
           set_number: i + 1,
@@ -216,6 +232,7 @@ function SessionBody({ day }: { day: WorkoutDay }) {
               ex={ex}
               rows={state[ex.rowId] ?? []}
               onChange={(rows) => updateRows(ex.rowId, rows)}
+              returnTo={`/workout/${day.id}`}
             />
           ))}
         </div>

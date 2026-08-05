@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import { ProfileEditor } from "@/components/profile/ProfileEditor";
 
 export default async function ProfilePage() {
   const supabase = createClient();
@@ -10,19 +11,16 @@ export default async function ProfilePage() {
     .select("username, display_name, email, unit_system")
     .eq("id", user!.id)
     .single();
+  const { data: latestWeight } = await supabase
+    .from("bodyweight_logs")
+    .select("weight_kg")
+    .eq("owner_id", user!.id)
+    .order("measured_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
 
   const name = profile?.display_name || profile?.username || "Atleta";
   const initial = name.charAt(0).toUpperCase();
-
-  const rows = [
-    { label: "Usuario", value: profile?.username ?? "—" },
-    { label: "Nombre", value: profile?.display_name ?? "—" },
-    { label: "Email", value: profile?.email ?? "—" },
-    {
-      label: "Unidades",
-      value: profile?.unit_system === "imperial" ? "Imperial (lb)" : "Métrico (kg)",
-    },
-  ];
 
   return (
     <div className="flex flex-col gap-6">
@@ -38,25 +36,18 @@ export default async function ProfilePage() {
         </div>
       </div>
 
-      <dl className="overflow-hidden rounded-lg bg-surface shadow-card">
-        {rows.map((r, i) => (
-          <div
-            key={r.label}
-            className={`flex items-center justify-between px-5 py-4 ${
-              i > 0 ? "border-t border-border" : ""
-            }`}
-          >
-            <dt className="font-mono text-[11px] uppercase tracking-[0.1em] text-ink-mute">
-              {r.label}
-            </dt>
-            <dd className="text-sm font-medium text-ink">{r.value}</dd>
-          </div>
-        ))}
-      </dl>
+      <div className="rounded-xl border border-border bg-surface-2/70 px-4 py-3">
+        <p className="font-mono text-[10px] uppercase tracking-[0.1em] text-ink-faint">
+          @{profile?.username ?? "usuario"} · {profile?.email ?? "sin email"}
+        </p>
+      </div>
 
-      <p className="text-sm text-ink-faint">
-        Editar nombre y unidades, y registrar peso corporal: más adelante.
-      </p>
+      <ProfileEditor
+        userId={user!.id}
+        initialName={name}
+        initialUnits={profile?.unit_system === "imperial" ? "imperial" : "metric"}
+        initialWeight={latestWeight?.weight_kg ?? null}
+      />
     </div>
   );
 }

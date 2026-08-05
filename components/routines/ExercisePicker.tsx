@@ -14,12 +14,13 @@ export function ExercisePicker({
   open: boolean;
   title: string;
   onClose: () => void;
-  onPick: (exerciseId: string) => void;
+  onPick: (exerciseId: string) => void | Promise<unknown>;
 }) {
   const [q, setQ] = useState("");
   const [debouncedQ, setDebouncedQ] = useState("");
   const [muscle, setMuscle] = useState("");
   const [equipment, setEquipment] = useState("");
+  const [pickingId, setPickingId] = useState<string | null>(null);
 
   useEffect(() => {
     const id = setTimeout(() => setDebouncedQ(q), 300);
@@ -69,11 +70,19 @@ export function ExercisePicker({
               {data?.map((ex) => (
                 <button
                   key={ex.id}
-                  onClick={() => {
-                    onPick(ex.id);
-                    onClose();
+                  disabled={pickingId !== null}
+                  onClick={async () => {
+                    setPickingId(ex.id);
+                    try {
+                      await onPick(ex.id);
+                      onClose();
+                    } catch {
+                      window.alert("No se pudo guardar el ejercicio.");
+                    } finally {
+                      setPickingId(null);
+                    }
                   }}
-                  className="group flex flex-col overflow-hidden rounded-lg bg-surface text-left shadow-card transition hover:bg-surface-2"
+                  className="group flex flex-col overflow-hidden rounded-lg bg-surface text-left shadow-card transition hover:bg-surface-2 disabled:opacity-50"
                 >
                   <div className="aspect-square overflow-hidden bg-surface-3">
                     {ex.image_start && (
@@ -90,7 +99,9 @@ export function ExercisePicker({
                       {ex.name_es ?? ex.name}
                     </div>
                     <div className="font-mono text-[10px] uppercase tracking-[0.1em] text-ink-mute">
-                      {esMuscle(ex.primary_muscles?.[0])}
+                      {pickingId === ex.id
+                        ? "Guardando…"
+                        : esMuscle(ex.primary_muscles?.[0])}
                     </div>
                   </div>
                 </button>

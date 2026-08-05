@@ -11,24 +11,27 @@ import {
 } from "@/lib/queries/routines";
 import { InlineSetsReps } from "./InlineSetsReps";
 import { ExercisePicker } from "./ExercisePicker";
+import { exerciseDetailHref } from "@/lib/navigation";
 
 export function SortableExerciseItem({
   routineId,
   dayId,
   re,
+  readOnly = false,
 }: {
   routineId: string;
   dayId: string;
   re: RoutineExercise;
+  readOnly?: boolean;
 }) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } =
-    useSortable({ id: re.id });
+    useSortable({ id: re.id, disabled: readOnly });
   const remove = useRemoveExercise();
   const swap = useSwapExercise();
   const [picker, setPicker] = useState(false);
 
   const href = re.exercise
-    ? `/exercises/${encodeURIComponent(re.exercise.slug)}`
+    ? exerciseDetailHref(re.exercise.slug, `/routines/${routineId}`)
     : "#";
 
   return (
@@ -40,7 +43,7 @@ export function SortableExerciseItem({
       }`}
     >
       <div className="flex items-start gap-2.5">
-        <button
+        {!readOnly && <button
           {...attributes}
           {...listeners}
           aria-label="Reordenar ejercicio"
@@ -54,7 +57,7 @@ export function SortableExerciseItem({
             <circle cx="5" cy="13" r="1.4" />
             <circle cx="11" cy="13" r="1.4" />
           </svg>
-        </button>
+        </button>}
 
         <Link
           href={href}
@@ -78,7 +81,7 @@ export function SortableExerciseItem({
             >
               {re.exercise?.name_es ?? re.exercise?.name ?? "Ejercicio"}
             </Link>
-            <div className="flex shrink-0 gap-2.5">
+            {!readOnly && <div className="flex shrink-0 gap-2.5">
               <button
                 onClick={() => setPicker(true)}
                 className="font-mono text-[10px] uppercase tracking-[0.1em] text-ink-faint transition hover:text-accent"
@@ -93,23 +96,39 @@ export function SortableExerciseItem({
               >
                 Quitar
               </button>
-            </div>
+            </div>}
           </div>
         </div>
       </div>
 
-      <div className="mt-2.5 pl-[34px]">
-        <InlineSetsReps routineId={routineId} dayId={dayId} re={re} />
+      <div className={`mt-2.5 ${readOnly ? "pl-[58px]" : "pl-[34px]"}`}>
+        {readOnly ? (
+          <div className="flex flex-col gap-1">
+            <p className="font-mono text-[11px] uppercase tracking-[0.08em] text-ink-mute">{formatTarget(re)}</p>
+            {re.notes && <p className="text-[13px] text-ink-mute">{re.notes}</p>}
+          </div>
+        ) : <InlineSetsReps routineId={routineId} dayId={dayId} re={re} />}
       </div>
 
-      <ExercisePicker
+      {!readOnly && <ExercisePicker
         open={picker}
         title="Cambiar ejercicio"
         onClose={() => setPicker(false)}
         onPick={(exerciseId) =>
-          swap.mutate({ routineId, dayId, rowId: re.id, newExerciseId: exerciseId })
+          swap.mutateAsync({ routineId, dayId, rowId: re.id, newExerciseId: exerciseId })
         }
-      />
+      />}
     </div>
   );
+}
+
+function formatTarget(re: RoutineExercise) {
+  const sets = re.target_sets ? `${re.target_sets} series` : "Series indicadas";
+  if (re.target_reps_min && re.target_reps_max) {
+    const reps = re.target_reps_min === re.target_reps_max
+      ? `${re.target_reps_min} reps`
+      : `${re.target_reps_min}–${re.target_reps_max} reps`;
+    return `${sets} · ${reps}`;
+  }
+  return sets;
 }

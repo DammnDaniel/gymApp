@@ -32,9 +32,14 @@ export function useExercises(filters: ExerciseFilters) {
         .order("name")
         .limit(150);
 
-      if (filters.q)
+      const safeQ = filters.q
+        ?.trim()
+        .slice(0, 80)
+        .replace(/[,%()]/g, " ")
+        .replace(/\s+/g, " ");
+      if (safeQ)
         query = query.or(
-          `name.ilike.%${filters.q}%,name_es.ilike.%${filters.q}%`,
+          `name.ilike.%${safeQ}%,name_es.ilike.%${safeQ}%`,
         );
       if (filters.muscle)
         query = query.contains("primary_muscles", [filters.muscle]);

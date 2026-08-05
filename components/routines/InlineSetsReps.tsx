@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   useUpdateRoutineExercise,
   type RoutineExercise,
@@ -24,9 +24,14 @@ export function InlineSetsReps({
   const [rmax, setRmax] = useState(re.target_reps_max?.toString() ?? "");
   const [notes, setNotes] = useState(re.notes ?? "");
 
-  const toNum = (v: string) => {
+  useEffect(() => setSets(re.target_sets?.toString() ?? ""), [re.target_sets]);
+  useEffect(() => setRmin(re.target_reps_min?.toString() ?? ""), [re.target_reps_min]);
+  useEffect(() => setRmax(re.target_reps_max?.toString() ?? ""), [re.target_reps_max]);
+  useEffect(() => setNotes(re.notes ?? ""), [re.notes]);
+
+  const toNum = (v: string, min: number, max: number) => {
     const n = Number.parseInt(v, 10);
-    return Number.isFinite(n) ? n : null;
+    return Number.isFinite(n) && n >= min && n <= max ? n : null;
   };
   const save = (
     patch: Partial<
@@ -43,7 +48,7 @@ export function InlineSetsReps({
         inputMode="numeric"
         value={sets}
         onChange={(e) => setSets(e.target.value)}
-        onBlur={() => save({ target_sets: toNum(sets) })}
+        onBlur={() => save({ target_sets: toNum(sets, 1, 20) })}
         placeholder="—"
         aria-label="Series"
         className={numCls}
@@ -53,7 +58,7 @@ export function InlineSetsReps({
         inputMode="numeric"
         value={rmin}
         onChange={(e) => setRmin(e.target.value)}
-        onBlur={() => save({ target_reps_min: toNum(rmin) })}
+        onBlur={() => save({ target_reps_min: toNum(rmin, 1, 1000) })}
         placeholder="—"
         aria-label="Reps mínimas"
         className={numCls}
@@ -63,7 +68,7 @@ export function InlineSetsReps({
         inputMode="numeric"
         value={rmax}
         onChange={(e) => setRmax(e.target.value)}
-        onBlur={() => save({ target_reps_max: toNum(rmax) })}
+        onBlur={() => save({ target_reps_max: toNum(rmax, 1, 1000) })}
         placeholder="—"
         aria-label="Reps máximas"
         className={numCls}
