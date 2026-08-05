@@ -35,13 +35,20 @@ funciona todavía (eso llega en la Fase 1).
 | `NEXT_PUBLIC_SUPABASE_URL` | Supabase → Settings → API → Project URL | No |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase → Settings → API → anon public | No |
 | `SUPABASE_SERVICE_ROLE_KEY` | Supabase → Settings → API → service_role | **Sí** |
+| `GEMINI_API_KEY` | Google AI Studio → API keys; usa un proyecto sin facturación para mantener el Coach en el nivel gratuito | **Sí** |
+
+El Coach usa `gemini-3.5-flash` y no recurre a OpenAI ni al AI Gateway. En el
+nivel gratuito de Gemini, al agotarse la cuota las peticiones fallan con un
+aviso y no se aplica ningún cambio a la rutina. No expongas la clave mediante
+una variable `NEXT_PUBLIC_*`.
 
 ## Despliegue (Vercel)
 
 1. Crea el repo `gymapp` en GitHub y haz push (`git remote add origin … && git push -u origin main`).
 2. En Vercel: *Add New → Project* → importa `gymapp`.
 3. *Settings → Environment Variables*: añade `NEXT_PUBLIC_SUPABASE_URL`,
-   `NEXT_PUBLIC_SUPABASE_ANON_KEY` y `SUPABASE_SERVICE_ROLE_KEY`.
+   `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY` y
+   `GEMINI_API_KEY`.
 4. Cada `git push` republica solo.
 
 ## Estructura

@@ -373,7 +373,7 @@ export function CoachChat({
         <header className="flex flex-wrap items-end justify-between gap-4 border-b border-ink bg-inverse px-5 py-5 text-[var(--inverse-text)] sm:px-6">
           <div>
             <p className="font-mono text-[9px] font-semibold uppercase tracking-[0.16em] text-accent">
-              Coach contextual · beta
+              Coach contextual · Gemini gratis
             </p>
             <h1 className="mt-2 font-display text-[clamp(2rem,8vw,3.4rem)] font-black leading-[0.88] tracking-[-0.06em]">
               Pregunta.<br />Comprueba. Decide.
@@ -493,7 +493,8 @@ export function CoachChat({
             <span>{input.length}/2400</span>
           </div>
           <p className="mt-3 text-[10px] leading-4 text-ink-faint">
-            El Coach puede equivocarse. Dolor, lesión o síntomas extraños requieren valoración profesional.
+            El Coach puede equivocarse. No introduzcas datos personales o médicos sensibles. Dolor,
+            lesión o síntomas extraños requieren valoración profesional.
           </p>
         </form>
       </section>
