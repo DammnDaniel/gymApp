@@ -13,7 +13,7 @@ export type SetRow = {
 };
 
 const inp =
-  "w-full rounded-sm border border-border bg-surface-3 px-1 py-1.5 text-center font-mono text-[14px] tabular-nums text-ink outline-none focus:border-transparent focus:shadow-focusring";
+  "min-h-10 w-full border border-border bg-bg-0 px-1 py-1.5 text-center font-mono text-[14px] tabular-nums text-ink outline-none focus:border-signal focus:shadow-focusring";
 const head =
   "text-center font-mono text-[10px] uppercase tracking-[0.08em] text-ink-faint";
 const grid = "grid grid-cols-[24px_1fr_1fr_1fr_34px] items-center gap-2";
@@ -48,14 +48,14 @@ export function ExerciseLogger({
     <div className="mb-3 flex items-center gap-3">
       <Link
         href={ex.slug ? exerciseDetailHref(ex.slug, returnTo) : "#"}
-        className="h-11 w-11 shrink-0 overflow-hidden rounded-sm bg-surface-3"
+        className="h-14 w-14 shrink-0 overflow-hidden border border-ink/20 bg-surface-3"
       >
         {ex.image_start && (
           <img src={ex.image_start} alt="" className="h-full w-full object-cover" />
         )}
       </Link>
       <div className="min-w-0">
-        <div className="truncate font-display text-base font-bold tracking-tightd text-ink">
+        <div className="line-clamp-2 font-display text-lg font-extrabold leading-[1.05] tracking-[-0.04em] text-ink">
           {name}
         </div>
         {(target || isCardio) && (
@@ -76,7 +76,7 @@ export function ExerciseLogger({
       done: false,
     };
     return (
-      <section className="rounded-lg bg-surface p-4 shadow-card">
+      <section className="border border-ink bg-surface p-4 shadow-card">
         {Header}
         {ex.notes && <p className="mb-3 text-xs text-ink-mute">{ex.notes}</p>}
         <div className="flex items-center gap-3">
@@ -86,7 +86,7 @@ export function ExerciseLogger({
             onChange={(e) => onChange([{ ...row, minutes: e.target.value }])}
             placeholder="—"
             aria-label="Minutos"
-            className="w-20 rounded-sm border border-border bg-surface-3 px-2 py-2 text-center font-mono text-base tabular-nums text-ink outline-none focus:border-transparent focus:shadow-focusring"
+            className="min-h-11 w-20 border border-border bg-bg-0 px-2 py-2 text-center font-mono text-base tabular-nums text-ink outline-none focus:border-signal focus:shadow-focusring"
           />
           <span className="font-mono text-[11px] uppercase tracking-[0.1em] text-ink-mute">
             minutos
@@ -94,10 +94,10 @@ export function ExerciseLogger({
           <button
             onClick={() => onChange([{ ...row, done: !row.done }])}
             aria-label="Marcar hecho"
-            className={`ml-auto flex h-9 w-9 items-center justify-center rounded-sm border font-mono text-sm transition ${
+            className={`ml-auto flex h-11 w-11 items-center justify-center border font-mono text-sm transition ${
               row.done
-                ? "border-accent bg-accent text-accent-ink"
-                : "border-border text-ink-faint hover:text-ink"
+                ? "border-ink bg-accent text-accent-ink"
+                : "border-border bg-bg-0 text-ink-mute hover:border-ink hover:text-ink"
             }`}
           >
             ✓
@@ -108,7 +108,7 @@ export function ExerciseLogger({
   }
 
   return (
-    <section className="rounded-lg bg-surface p-4 shadow-card">
+    <section className="border border-ink bg-surface p-4 shadow-card sm:p-5">
       {Header}
       {ex.notes && <p className="mb-3 text-xs text-ink-mute">{ex.notes}</p>}
 
@@ -157,10 +157,10 @@ export function ExerciseLogger({
             <button
               onClick={() => update(i, { done: !r.done })}
               aria-label="Marcar serie hecha"
-              className={`flex h-8 w-8 items-center justify-center rounded-sm border font-mono text-sm transition ${
+              className={`flex h-10 w-10 items-center justify-center border font-mono text-sm transition ${
                 r.done
-                  ? "border-accent bg-accent text-accent-ink"
-                  : "border-border text-ink-faint hover:text-ink"
+                  ? "border-ink bg-accent text-accent-ink"
+                  : "border-border bg-bg-0 text-ink-mute hover:border-ink hover:text-ink"
               }`}
             >
               ✓
@@ -177,14 +177,14 @@ export function ExerciseLogger({
               { weight: "", reps: "", rpe: "", minutes: "", done: false },
             ])
           }
-          className="font-mono text-[10px] uppercase tracking-[0.1em] text-ink-mute transition hover:text-accent"
+          className="min-h-10 font-mono text-[9px] font-semibold uppercase tracking-[0.1em] text-ink-mute transition hover:text-signal"
         >
           + Serie
         </button>
         {rows.length > 1 && (
           <button
             onClick={() => onChange(rows.slice(0, -1))}
-            className="font-mono text-[10px] uppercase tracking-[0.1em] text-ink-faint transition hover:text-danger"
+            className="min-h-10 font-mono text-[9px] font-semibold uppercase tracking-[0.1em] text-ink-mute transition hover:text-danger"
           >
             − Serie
           </button>

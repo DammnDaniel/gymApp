@@ -12,12 +12,12 @@ export default function AppError({
   useEffect(() => console.error(error), [error]);
 
   return (
-    <div className="mx-auto flex max-w-md flex-col items-center gap-4 rounded-xl border border-border bg-surface p-7 text-center shadow-hero">
-      <div className="flex h-12 w-12 items-center justify-center rounded-full bg-danger/10 text-xl text-danger">
+    <div className="mx-auto flex max-w-md flex-col items-center gap-4 border border-ink bg-surface p-7 text-center shadow-hero">
+      <div className="flex h-12 w-12 items-center justify-center border border-danger bg-[rgba(199,45,39,0.09)] text-xl text-danger">
         !
       </div>
       <div>
-        <p className="kicker-accent">// Algo ha fallado</p>
+        <p className="kicker-accent">Algo ha fallado</p>
         <h1 className="mt-2 font-display text-xl font-extrabold text-ink">
           No hemos podido cargar esta pantalla
         </h1>
@@ -27,7 +27,7 @@ export default function AppError({
       </div>
       <button
         onClick={reset}
-        className="inline-flex h-11 items-center justify-center rounded-md bg-accent px-5 font-mono text-[12px] font-semibold uppercase text-accent-ink shadow-glow"
+        className="button-primary"
       >
         Reintentar
       </button>

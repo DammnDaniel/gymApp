@@ -65,12 +65,12 @@ export function ProfileEditor({
   }
 
   const inputClass =
-    "mt-2 h-11 w-full rounded-md border border-border bg-surface-3 px-3 text-sm text-ink outline-none transition focus:border-accent/50 focus:shadow-focusring";
+    "field mt-2 min-h-11 text-sm";
 
   return (
     <div className="flex flex-col gap-4">
-      <section className="rounded-xl border border-border bg-surface p-5 shadow-card">
-        <p className="kicker">// Datos del perfil</p>
+      <section className="panel p-5 sm:p-6">
+        <p className="rule-label">Datos del perfil</p>
         <label className="mt-4 block text-sm text-ink-mute">
           Nombre visible
           <input
@@ -96,19 +96,19 @@ export function ProfileEditor({
         <button
           onClick={saveProfile}
           disabled={savingProfile}
-          className="mt-5 inline-flex h-11 w-full items-center justify-center rounded-md bg-accent px-5 font-mono text-[12px] font-semibold uppercase text-accent-ink shadow-glow disabled:opacity-50"
+          className="button-primary mt-5 w-full"
         >
           {savingProfile ? "Guardando" : "Guardar perfil"}
         </button>
       </section>
 
-      <section className="rounded-xl border border-border bg-surface p-5 shadow-card">
-        <p className="kicker">// Peso corporal</p>
-        <p className="mt-2 text-sm text-ink-mute">
+      <section className="border border-ink bg-inverse p-5 text-[var(--inverse-text)] sm:p-6">
+        <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.14em] text-accent">Peso corporal</p>
+        <p className="mt-2 text-sm text-[#b9c0bc]">
           Añade una medición para verla en Progreso.
         </p>
         <div className="mt-3 flex items-end gap-3">
-          <label className="min-w-0 flex-1 text-sm text-ink-mute">
+          <label className="min-w-0 flex-1 text-sm text-[#b9c0bc]">
             Peso actual
             <input
               inputMode="decimal"
@@ -118,14 +118,14 @@ export function ProfileEditor({
               className={inputClass}
             />
           </label>
-          <span className="pb-3 font-mono text-xs uppercase text-ink-mute">
+          <span className="pb-3 font-mono text-xs uppercase text-[#b9c0bc]">
             {units === "imperial" ? "lb" : "kg"}
           </span>
         </div>
         <button
           onClick={saveWeight}
           disabled={savingWeight}
-          className="mt-5 inline-flex h-11 w-full items-center justify-center rounded-md border border-border-strong bg-surface-2 px-5 font-mono text-[12px] font-semibold uppercase text-ink transition hover:border-accent/40 disabled:opacity-50"
+          className="mt-5 inline-flex min-h-11 w-full items-center justify-center border border-[#aeb5b0] px-5 font-mono text-[11px] font-bold uppercase tracking-[0.06em] text-[var(--inverse-text)] transition hover:border-accent hover:text-accent disabled:opacity-50"
         >
           {savingWeight ? "Registrando" : "Registrar peso"}
         </button>

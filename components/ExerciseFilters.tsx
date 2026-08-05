@@ -18,7 +18,7 @@ export function ExerciseFilters({
   onEquipment: (v: string) => void;
 }) {
   return (
-    <div className="flex flex-col gap-3">
+    <div className="panel flex flex-col gap-4 p-4 sm:p-5">
       <div className="relative">
         <svg
           viewBox="0 0 24 24"
@@ -37,11 +37,11 @@ export function ExerciseFilters({
           placeholder="Buscar ejercicio…"
           value={q}
           onChange={(e) => onQ(e.target.value)}
-          className="h-12 w-full rounded-md border border-border bg-surface-2 pl-11 pr-4 text-[16px] text-ink placeholder:text-ink-faint focus:border-transparent focus:bg-surface-3 focus:outline-none focus:shadow-focusring"
+          className="field pl-11"
         />
       </div>
 
-      <div className="no-scrollbar -mx-5 flex gap-2 overflow-x-auto px-5 pb-1">
+      <div className="no-scrollbar -mx-4 flex gap-2 overflow-x-auto px-4 pb-1 sm:-mx-5 sm:px-5">
         <Chip selected={muscle === ""} onClick={() => onMuscle("")}>
           Todos
         </Chip>
@@ -59,7 +59,7 @@ export function ExerciseFilters({
       <select
         value={equipment}
         onChange={(e) => onEquipment(e.target.value)}
-        className="h-11 rounded-md border border-border bg-surface-2 px-3 text-sm text-ink outline-none focus:border-transparent focus:bg-surface-3 focus:shadow-focusring"
+        className="field min-h-11 text-sm"
       >
         <option value="">Todo el equipo</option>
         {EQUIPMENT_OPTIONS.map((e) => (
@@ -87,8 +87,8 @@ function Chip({
       onClick={onClick}
       className={
         selected
-          ? "inline-flex shrink-0 items-center rounded-sm border border-accent/30 bg-accent-soft px-3 py-1.5 text-xs font-medium text-accent transition active:scale-[0.96]"
-          : "inline-flex shrink-0 items-center rounded-sm border border-border bg-surface-2 px-3 py-1.5 text-xs font-medium text-ink-mute transition hover:text-ink active:scale-[0.96]"
+          ? "inline-flex min-h-10 shrink-0 items-center border border-ink bg-inverse px-3 text-xs font-semibold text-[var(--inverse-text)] transition active:translate-y-px"
+          : "inline-flex min-h-10 shrink-0 items-center border border-border bg-bg-0 px-3 text-xs font-medium text-ink-mute transition hover:border-ink hover:text-ink active:translate-y-px"
       }
     >
       {children}

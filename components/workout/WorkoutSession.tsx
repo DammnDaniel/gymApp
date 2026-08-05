@@ -202,30 +202,30 @@ function SessionBody({ day }: { day: WorkoutDay }) {
   const ss = String(elapsed % 60).padStart(2, "0");
 
   return (
-    <div className="flex flex-col gap-5">
-      <div className="flex items-center justify-between">
+    <div className="flex flex-col gap-7">
+      <div className="flex min-h-11 items-center justify-between border-b border-ink/20 pb-3">
         <Link href="/routines" className="kicker-accent">
-          &lt; Salir
+          ← Salir del modo sesión
         </Link>
-        <span className="rounded-sm bg-surface-2 px-2.5 py-1 font-mono text-sm tabular-nums text-ink">
+        <span className="border border-ink bg-inverse px-3 py-2 font-mono text-sm font-semibold tabular-nums text-[var(--inverse-text)]">
           {mm}:{ss}
         </span>
       </div>
 
-      <div>
-        <p className="kicker">// {day.routineName}</p>
-        <h1 className="mt-1 font-display text-2xl font-extrabold tracking-tightd text-ink">
+      <div className="border-b border-ink pb-6">
+        <p className="kicker-accent">Sesión en curso · {day.routineName}</p>
+        <h1 className="mt-3 font-display text-[clamp(2.5rem,10vw,4.75rem)] font-black leading-[0.88] tracking-[-0.065em] text-ink">
           {day.name}
         </h1>
-        <p className="mt-1.5 font-mono text-[10px] uppercase tracking-[0.1em] text-ink-faint">
-          Tu progreso se guarda solo · sal y vuelve cuando quieras
+        <p className="mt-5 border-l-4 border-signal pl-3 font-mono text-[9px] font-semibold uppercase leading-5 tracking-[0.12em] text-ink-mute">
+          Borrador automático · puedes salir y volver sin perder series
         </p>
       </div>
 
       {day.exercises.length === 0 ? (
         <p className="text-sm text-ink-mute">Este día no tiene ejercicios.</p>
       ) : (
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-5">
           {day.exercises.map((ex) => (
             <ExerciseLogger
               key={ex.rowId}
@@ -238,18 +238,20 @@ function SessionBody({ day }: { day: WorkoutDay }) {
         </div>
       )}
 
-      <button
-        onClick={onFinish}
-        disabled={save.isPending}
-        className="inline-flex h-12 w-full items-center justify-center gap-2 rounded-md bg-accent px-5 font-mono text-[13px] font-semibold uppercase tracking-[0.04em] text-accent-ink shadow-glow transition active:scale-[0.99] disabled:opacity-50"
-      >
-        {save.isPending
-          ? "Guardando"
-          : `Finalizar entreno · ${totalDone} ${totalDone === 1 ? "serie" : "series"}`}
-      </button>
+      <div className="sticky bottom-[calc(12px+env(safe-area-inset-bottom))] z-20 border border-ink bg-inverse p-2 shadow-hero">
+        <button
+          onClick={onFinish}
+          disabled={save.isPending}
+          className="button-primary w-full"
+        >
+          {save.isPending
+            ? "Guardando"
+            : `Finalizar · ${totalDone} ${totalDone === 1 ? "serie" : "series"}`}
+        </button>
+      </div>
       <button
         onClick={onDiscard}
-        className="mx-auto -mt-1 font-mono text-[10px] uppercase tracking-[0.12em] text-ink-faint transition hover:text-danger"
+        className="mx-auto min-h-11 -mt-3 font-mono text-[9px] font-semibold uppercase tracking-[0.12em] text-ink-mute transition hover:text-danger"
       >
         Descartar entreno
       </button>

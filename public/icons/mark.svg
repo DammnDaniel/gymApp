@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Training Log">
+  <rect width="512" height="512" fill="#ecece5"/>
+  <rect x="56" y="56" width="400" height="400" fill="#151b1a"/>
+  <rect x="312" y="56" width="144" height="144" fill="#ff6138"/>
+  <path fill="#f7f5ec" d="M112 144h144v44h-48v148h-48V188h-48zM264 224h48v112h88v44H264z"/>
+</svg>

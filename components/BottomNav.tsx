@@ -4,17 +4,17 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 const items = [
-  { href: "/dashboard", label: "Inicio", icon: "home" },
-  { href: "/routines", label: "Rutinas", icon: "list" },
-  { href: "/exercises", label: "Ejercicios", icon: "bolt" },
-  { href: "/history", label: "Historial", icon: "clock" },
-  { href: "/profile", label: "Perfil", icon: "user" },
+  { href: "/dashboard", label: "Inicio", icon: "home", index: "01" },
+  { href: "/routines", label: "Plan", icon: "list", index: "02" },
+  { href: "/exercises", label: "Técnica", icon: "bolt", index: "03" },
+  { href: "/history", label: "Diario", icon: "clock", index: "04" },
+  { href: "/profile", label: "Perfil", icon: "user", index: "05" },
 ] as const;
 
 function NavIcon({ name }: { name: (typeof items)[number]["icon"] }) {
   const common = {
     viewBox: "0 0 24 24",
-    className: "h-[19px] w-[19px]",
+    className: "h-[18px] w-[18px]",
     fill: "none",
     stroke: "currentColor",
     strokeWidth: 1.9,
@@ -36,10 +36,12 @@ function NavIcon({ name }: { name: (typeof items)[number]["icon"] }) {
 export function BottomNav() {
   const pathname = usePathname();
 
+  if (pathname.startsWith("/workout/")) return null;
+
   return (
     <nav
       aria-label="Navegación principal"
-      className="fixed inset-x-2.5 bottom-[calc(8px+env(safe-area-inset-bottom))] z-30 mx-auto max-w-[620px] rounded-[22px] border border-white/[0.08] bg-surface/90 p-1.5 shadow-hero backdrop-blur-2xl"
+      className="fixed inset-x-2.5 bottom-[calc(8px+env(safe-area-inset-bottom))] z-30 mx-auto max-w-[680px] border border-ink bg-inverse px-1.5 py-1.5 shadow-hero"
     >
       <div className="grid grid-cols-5 gap-1">
         {items.map((item) => {
@@ -52,14 +54,17 @@ export function BottomNav() {
               key={item.href}
               href={item.href}
               aria-current={active ? "page" : undefined}
-              className={`flex min-w-0 flex-col items-center justify-center gap-1 rounded-2xl px-1 py-2 transition active:scale-95 ${
+              className={`relative flex min-h-[54px] min-w-0 flex-col items-center justify-center gap-1 px-1 py-1.5 transition active:translate-y-px ${
                 active
-                  ? "bg-accent text-accent-ink shadow-glow"
-                  : "text-ink-faint hover:bg-surface-2 hover:text-ink"
+                  ? "bg-accent text-accent-ink"
+                  : "text-[#b8beb9] hover:bg-white/[0.07] hover:text-white"
               }`}
             >
+              <span className="absolute left-1.5 top-1 font-mono text-[7px] font-bold opacity-65" aria-hidden>
+                {item.index}
+              </span>
               <NavIcon name={item.icon} />
-              <span className="max-w-full truncate font-mono text-[8px] font-semibold uppercase tracking-[0.04em] sm:text-[9px]">
+              <span className="max-w-full truncate font-mono text-[8px] font-semibold uppercase tracking-[0.06em] sm:text-[9px]">
                 {item.label}
               </span>
             </Link>

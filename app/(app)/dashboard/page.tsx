@@ -25,67 +25,87 @@ export default async function DashboardPage() {
   const days = [...((activeRoutine as any)?.routine_days ?? [])].sort(
     (a: any, b: any) => a.position - b.position,
   );
-  const firstDay = days[0];
-  const trainHref = firstDay ? `/workout/${firstDay.id}` : "/routines";
+  const { data: latestSession } = await supabase
+    .from("workout_sessions")
+    .select("routine_day_id, performed_at")
+    .eq("owner_id", user!.id)
+    .order("performed_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+  const previousIndex = days.findIndex(
+    (day: any) => day.id === latestSession?.routine_day_id,
+  );
+  const nextDay = days.length
+    ? days[previousIndex >= 0 ? (previousIndex + 1) % days.length : 0]
+    : null;
+  const trainHref = nextDay ? `/workout/${nextDay.id}` : "/routines";
 
   const sections = [
-    { href: "/exercises", title: "Biblioteca", desc: "Ejercicios, técnica y consejos" },
-    { href: "/routines", title: "Rutinas", desc: "Tus días y ejercicios" },
-    { href: "/progress", title: "Progreso", desc: "Cargas, récords y evolución" },
-    { href: "/history", title: "Historial", desc: "Sesiones registradas · editar/borrar" },
+    { href: "/routines", index: "01", title: "Plan", desc: "Consulta y ajusta cada día" },
+    { href: "/exercises", index: "02", title: "Técnica", desc: "Movimientos y ejecución" },
+    { href: "/progress", index: "03", title: "Progreso", desc: "Cargas, récords y volumen" },
+    { href: "/history", index: "04", title: "Diario", desc: "Revisa y edita sesiones" },
   ];
 
   return (
-    <div className="flex flex-col gap-8">
-      <div>
-        <p className="kicker-accent">// Bienvenido de nuevo</p>
-        <h1 className="mt-2 font-display text-[32px] font-extrabold leading-none tracking-tightd text-ink">
-          {name}
-        </h1>
+    <div className="flex flex-col gap-10">
+      <div className="grid gap-5 border-b border-ink pb-6 sm:grid-cols-[1fr_auto] sm:items-end">
+        <div>
+          <p className="kicker-accent">Cuaderno de entrenamiento</p>
+          <h1 className="page-title mt-3">Hola,<br />{name}.</h1>
+        </div>
+        <div className="w-fit border-l-4 border-signal pl-3 font-mono text-[10px] font-semibold uppercase leading-5 tracking-[0.12em] text-ink-mute">
+          Próximo bloque<br />calculado por historial
+        </div>
       </div>
 
       <Link
         href={trainHref}
-        className="group relative block overflow-hidden rounded-2xl border border-white/[0.07] bg-surface p-6 shadow-hero transition hover:-translate-y-0.5 hover:border-accent/20 active:scale-[0.99]"
+        className="group relative block overflow-hidden border border-ink bg-inverse p-6 text-[var(--inverse-text)] shadow-hero transition hover:-translate-y-0.5 active:translate-y-0 sm:p-8"
       >
-        <div className="pointer-events-none absolute inset-0 bg-[var(--grain)]" />
-        <div className="relative">
-          <p className="font-mono text-[11px] uppercase tracking-kicker text-accent">
-            // Siguiente sesión
+        <div className="pointer-events-none absolute inset-0 bg-[var(--grain)] bg-[length:28px_28px] opacity-20" />
+        <div className="absolute right-0 top-0 h-16 w-16 bg-accent" aria-hidden />
+        <div className="relative grid gap-7 sm:grid-cols-[1fr_auto] sm:items-end">
+          <div>
+          <p className="font-mono text-[10px] font-semibold uppercase tracking-[0.15em] text-[#aeb5b0]">
+            Próxima sesión
           </p>
-          <h2 className="mt-2 font-display text-[28px] font-extrabold leading-none tracking-tightd text-ink">
-            {firstDay?.name ?? "Entrenar hoy"}
+          <h2 className="mt-3 max-w-[12ch] font-display text-[clamp(2rem,8vw,4.1rem)] font-black leading-[0.9] tracking-[-0.06em]">
+            {nextDay?.name ?? "Prepara tu plan"}
           </h2>
-          <p className="mt-2 max-w-[30ch] text-sm text-ink-mute">
+          <p className="mt-4 max-w-[36ch] text-sm leading-6 text-[#b9c0bc]">
             {activeRoutine?.name
-              ? `${activeRoutine.name} · registra cada serie sin perder el progreso.`
-              : "Abre tu rutina y registra cada serie."}
+              ? `${activeRoutine.name} · el borrador se guarda aunque salgas.`
+              : "Crea una rutina para empezar a registrar tu trabajo."}
           </p>
-          <span className="mt-5 inline-flex h-11 items-center gap-2 rounded-md bg-accent px-5 font-mono text-[13px] font-semibold uppercase tracking-[0.04em] text-accent-ink shadow-glow">
-            Empezar <span aria-hidden>→</span>
+          </div>
+          <span className="inline-flex min-h-12 w-fit items-center gap-3 border border-accent bg-accent px-5 font-mono text-[11px] font-bold uppercase tracking-[0.08em] text-accent-ink transition group-hover:bg-white">
+            Abrir sesión <span className="text-base" aria-hidden>↗</span>
           </span>
         </div>
       </Link>
 
       <div>
-        <div className="mb-3 flex items-baseline justify-between">
-          <span className="kicker">// Accesos rápidos</span>
+        <div className="mb-4 flex items-baseline justify-between border-b border-ink/20 pb-3">
+          <span className="rule-label">Índice</span>
+          <span className="font-mono text-[9px] uppercase tracking-[0.14em] text-ink-faint">Edición actual</span>
         </div>
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+        <div className="grid grid-cols-1 border-t border-ink sm:grid-cols-2">
           {sections.map((s) => (
             <Link
               key={s.href}
               href={s.href}
-              className="group flex min-h-[104px] items-center justify-between rounded-xl border border-transparent bg-surface p-5 shadow-card transition hover:border-white/[0.07] hover:bg-surface-2"
+              className="group grid min-h-[112px] grid-cols-[36px_1fr_auto] items-center gap-3 border-b border-ink/25 bg-transparent p-4 transition hover:bg-surface sm:odd:border-r"
             >
+              <span className="self-start pt-1 font-mono text-[9px] font-semibold text-accent-press">{s.index}</span>
               <div>
-                <div className="font-display text-base font-bold tracking-tightd text-ink">
+                <div className="font-display text-lg font-extrabold tracking-[-0.04em] text-ink">
                   {s.title}
                 </div>
-                <div className="mt-0.5 text-sm text-ink-mute">{s.desc}</div>
+                <div className="mt-1 text-sm text-ink-mute">{s.desc}</div>
               </div>
-              <span className="font-mono text-ink-faint transition group-hover:translate-x-0.5 group-hover:text-accent">
-                &gt;
+              <span className="font-mono text-xl text-ink transition group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-accent-press">
+                ↗
               </span>
             </Link>
           ))}

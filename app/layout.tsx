@@ -12,9 +12,9 @@ const splineMono = Spline_Sans_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "GymApp",
-  description: "Entrenamiento, rutinas y progreso.",
-  themeColor: "#0a0b0d",
+  title: "Training Log",
+  description: "Tu cuaderno de entrenamiento, rutinas y progreso.",
+  themeColor: "#ecece5",
   viewport:
     "width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover",
 };

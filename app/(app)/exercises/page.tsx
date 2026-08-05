@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useExercises } from "@/lib/queries/exercises";
 import { ExerciseCard } from "@/components/ExerciseCard";
 import { ExerciseFilters } from "@/components/ExerciseFilters";
+import { PageIntro } from "@/components/PageIntro";
 
 export default function ExercisesPage() {
   const [q, setQ] = useState("");
@@ -23,18 +24,14 @@ export default function ExercisesPage() {
   });
 
   return (
-    <div className="flex flex-col gap-5">
-      <div>
-        <p className="kicker">// Biblioteca</p>
-        <div className="mt-1 flex items-baseline gap-2">
-          <span className="font-display text-stat font-extrabold tabular-nums text-ink">
-            {data ? data.length : "—"}
-          </span>
-          <span className="font-mono text-[11px] uppercase tracking-kicker text-ink-mute">
-            ejercicios
-          </span>
-        </div>
-      </div>
+    <div className="flex flex-col gap-8">
+      <PageIntro
+        eyebrow="Biblioteca de movimiento"
+        title="La técnica."
+        count={data ? data.length : "—"}
+        countLabel="ejercicios"
+        description="Busca por músculo o máquina y abre la ejecución antes de empezar."
+      />
 
       <ExerciseFilters
         q={q}
@@ -52,16 +49,16 @@ export default function ExercisesPage() {
       )}
 
       {isLoading ? (
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+        <div className="grid grid-cols-2 gap-px border border-ink/20 bg-ink/20 sm:grid-cols-3">
           {Array.from({ length: 9 }).map((_, i) => (
             <div
               key={i}
-              className="aspect-[3/4] animate-pulse rounded-lg bg-surface-3"
+              className="aspect-[3/4] animate-pulse bg-surface-3"
             />
           ))}
         </div>
       ) : data && data.length > 0 ? (
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+        <div className="grid grid-cols-2 gap-px border border-ink/20 bg-ink/20 sm:grid-cols-3">
           {data.map((ex) => (
             <ExerciseCard key={ex.id} ex={ex} />
           ))}
