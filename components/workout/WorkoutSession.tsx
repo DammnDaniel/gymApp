@@ -14,6 +14,8 @@ import { ExerciseLogger, type SetRow } from "./ExerciseLogger";
 
 type Draft = { state: Record<string, SetRow[]>; startedAt: number };
 
+const MAX_SESSION_SECONDS = 24 * 60 * 60;
+
 const draftKey = (dayId: string) => `gymapp:workout:${dayId}`;
 
 function autofillRows(ex: WorkoutExercise): SetRow[] {
@@ -83,7 +85,16 @@ function SessionBody({ day }: { day: WorkoutDay }) {
     for (const ex of day.exercises) {
       init[ex.rowId] = draft?.state?.[ex.rowId] ?? autofillRows(ex);
     }
-    return { state: init, startedAt: draft?.startedAt ?? Date.now() };
+    const now = Date.now();
+    const savedStartedAt = Number(draft?.startedAt);
+    const startedAtIsValid =
+      Number.isFinite(savedStartedAt) &&
+      savedStartedAt <= now + 60_000 &&
+      now - savedStartedAt <= MAX_SESSION_SECONDS * 1000;
+
+    // Un borrador puede conservar las series durante días, pero su cronómetro
+    // no debe bloquear el guardado al superar el límite de una sesión.
+    return { state: init, startedAt: startedAtIsValid ? savedStartedAt : now };
   });
 
   // Persistir el borrador en cada cambio (sobrevive a salir/cerrar y volver).
@@ -110,6 +121,20 @@ function SessionBody({ day }: { day: WorkoutDay }) {
     () => Object.values(state).flat().filter((r) => r.done).length,
     [state],
   );
+  const totalWithData = useMemo(
+    () =>
+      day.exercises.reduce((total, ex) => {
+        const rows = state[ex.rowId] ?? [];
+        if (ex.category === "cardio") {
+          return total + (rows[0]?.minutes.trim() ? 1 : 0);
+        }
+        return (
+          total +
+          rows.filter((row) => row.weight.trim() || row.reps.trim()).length
+        );
+      }, 0),
+    [day.exercises, state],
+  );
 
   function updateRows(rowId: string, rows: SetRow[]) {
     setSession((prev) => ({ ...prev, state: { ...prev.state, [rowId]: rows } }));
@@ -124,13 +149,14 @@ function SessionBody({ day }: { day: WorkoutDay }) {
   }
 
   async function onFinish() {
-    if (!window.confirm("¿Terminar y guardar la sesión en tu perfil?")) return;
+    if (save.isPending) return;
     const sets: SaveSetInput[] = [];
+    let ignoredCheckedRows = 0;
     for (const ex of day.exercises) {
       const rows = state[ex.rowId] ?? [];
       if (ex.category === "cardio") {
         const r = rows[0];
-        if (r && (r.done || r.minutes !== "")) {
+        if (r?.minutes.trim()) {
           const mins = parseInt(r.minutes, 10);
           if (!Number.isFinite(mins) || mins < 1 || mins > 1440) {
             window.alert("La duración de cardio debe estar entre 1 y 1440 minutos.");
@@ -145,49 +171,93 @@ function SessionBody({ day }: { day: WorkoutDay }) {
             duration_seconds: Number.isFinite(mins) ? mins * 60 : null,
             is_warmup: false,
           });
+        } else if (r?.done) {
+          ignoredCheckedRows += 1;
         }
         continue;
       }
-      rows.forEach((r, i) => {
-        const hasData = r.done || r.weight !== "" || r.reps !== "";
-        if (!hasData) return;
-        const w = parseFloat(r.weight.replace(",", "."));
-        const reps = parseInt(r.reps, 10);
-        const rpe = parseFloat(r.rpe.replace(",", "."));
-        if (Number.isFinite(w) && (w < 0 || w > 1000)) {
+      for (let i = 0; i < rows.length; i += 1) {
+        const row = rows[i];
+        const weightText = row.weight.trim();
+        const repsText = row.reps.trim();
+        const rpeText = row.rpe.trim();
+        const hasTrainingData = Boolean(weightText || repsText);
+        if (!hasTrainingData) {
+          if (row.done) ignoredCheckedRows += 1;
+          continue;
+        }
+
+        const weight = weightText
+          ? Number(weightText.replace(",", "."))
+          : null;
+        const reps = repsText ? Number(repsText) : null;
+        const rpe = rpeText ? Number(rpeText.replace(",", ".")) : null;
+
+        if (weight !== null && (!Number.isFinite(weight) || weight < 0 || weight > 1000)) {
           window.alert("Revisa el peso: debe estar entre 0 y 1000 kg.");
           return;
         }
-        if (Number.isFinite(reps) && (reps < 0 || reps > 1000)) {
-          window.alert("Revisa las repeticiones.");
+        if (
+          reps !== null &&
+          (!Number.isInteger(reps) || reps < 1 || reps > 1000)
+        ) {
+          window.alert("Revisa las repeticiones: deben ser un número entero entre 1 y 1000.");
           return;
         }
-        if (Number.isFinite(rpe) && (rpe < 0 || rpe > 10)) {
+        if (rpe !== null && (!Number.isFinite(rpe) || rpe < 0 || rpe > 10)) {
           window.alert("El RPE debe estar entre 0 y 10.");
           return;
         }
         sets.push({
           exerciseId: ex.exerciseId,
           set_number: i + 1,
-          weight_kg: Number.isFinite(w) ? w : null,
-          reps: Number.isFinite(reps) ? reps : null,
-          rpe: Number.isFinite(rpe) ? rpe : null,
+          weight_kg: weight,
+          reps,
+          rpe,
           duration_seconds: null,
           is_warmup: false,
         });
-      });
+      }
     }
     if (sets.length === 0) {
-      window.alert("No has registrado ninguna serie todavía.");
+      window.alert(
+        "No hay ninguna serie con datos. Introduce al menos el peso o las repeticiones antes de finalizar.",
+      );
       return;
     }
+    const ignoredMessage = ignoredCheckedRows
+      ? `\n\nSe ignorarán ${ignoredCheckedRows} ${ignoredCheckedRows === 1 ? "fila marcada" : "filas marcadas"} sin peso, repeticiones ni minutos.`
+      : "";
+    if (
+      !window.confirm(
+        `¿Terminar y guardar ${sets.length} ${sets.length === 1 ? "serie" : "series"} en tu perfil?${ignoredMessage}`,
+      )
+    )
+      return;
+
     try {
-      await save.mutateAsync({ dayId: day.id, durationSeconds: elapsed, sets });
+      await save.mutateAsync({
+        dayId: day.id,
+        durationSeconds: Math.min(elapsed, MAX_SESSION_SECONDS),
+        sets,
+      });
       clearDraft();
       router.replace("/history");
       router.refresh();
-    } catch {
-      window.alert("No se pudo guardar. Inténtalo de nuevo.");
+    } catch (error) {
+      const message =
+        typeof error === "object" && error && "message" in error
+          ? String(error.message)
+          : "";
+      if (/session|auth|jwt/i.test(message)) {
+        window.alert("Tu acceso ha caducado. Vuelve a iniciar sesión; el borrador seguirá guardado en este dispositivo.");
+      } else if (/duration/i.test(message)) {
+        window.alert("El cronómetro del borrador era demasiado antiguo. Recarga la página y vuelve a finalizar; tus series no se perderán.");
+      } else if (/set|serie|invalid|22023/i.test(message)) {
+        window.alert("Hay una serie con datos no válidos. Revisa peso, repeticiones y RPE; el borrador sigue guardado.");
+      } else {
+        window.alert("No se pudo guardar la sesión. El borrador no se ha perdido; comprueba la conexión y vuelve a intentarlo.");
+      }
     }
   }
 
@@ -246,8 +316,13 @@ function SessionBody({ day }: { day: WorkoutDay }) {
         >
           {save.isPending
             ? "Guardando"
-            : `Finalizar · ${totalDone} ${totalDone === 1 ? "serie" : "series"}`}
+            : `Finalizar · ${totalWithData} ${totalWithData === 1 ? "serie" : "series"}`}
         </button>
+        {totalDone > totalWithData && (
+          <p className="px-2 pb-1 pt-2 text-center font-mono text-[8px] uppercase tracking-[0.08em] text-[#b8beb9]">
+            Las filas vacías marcadas no se guardarán
+          </p>
+        )}
       </div>
       <button
         onClick={onDiscard}
