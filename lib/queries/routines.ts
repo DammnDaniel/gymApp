@@ -5,6 +5,7 @@ import {
   type QueryClient,
 } from "@tanstack/react-query";
 import { createClient } from "@/lib/supabase/client";
+import { syncRoutineDayName } from "@/lib/routine-day-name";
 
 // ─── Tipos ──────────────────────────────────────────────────────────
 export type RoutineListItem = {
@@ -342,11 +343,34 @@ export function useReorderDays() {
   return useMutation({
     mutationFn: async (input: { routineId: string; orderedDayIds: string[] }) => {
       const supabase = createClient();
-      await Promise.all(
+      const { data: currentDays, error: readError } = await supabase
+        .from("routine_days")
+        .select("id, name")
+        .eq("routine_id", input.routineId)
+        .in("id", input.orderedDayIds);
+      if (readError) throw readError;
+
+      const namesById = new Map(
+        (currentDays ?? []).map((day) => [day.id, day.name]),
+      );
+      if (namesById.size !== input.orderedDayIds.length) {
+        throw new Error("No se pudieron identificar todos los días de la rutina.");
+      }
+
+      const results = await Promise.all(
         input.orderedDayIds.map((id, i) =>
-          supabase.from("routine_days").update({ position: i }).eq("id", id),
+          supabase
+            .from("routine_days")
+            .update({
+              position: i,
+              name: syncRoutineDayName(namesById.get(id) ?? "", i),
+            })
+            .eq("routine_id", input.routineId)
+            .eq("id", id),
         ),
       );
+      const failed = results.find((result) => result.error);
+      if (failed?.error) throw failed.error;
     },
     onMutate: async (input) => {
       await qc.cancelQueries({ queryKey: routineKeys.detail(input.routineId) });
@@ -358,7 +382,13 @@ export function useReorderDays() {
         const days = input.orderedDayIds
           .map((id, i) => {
             const day = byId.get(id);
-            return day ? { ...day, position: i } : null;
+            return day
+              ? {
+                  ...day,
+                  position: i,
+                  name: syncRoutineDayName(day.name, i),
+                }
+              : null;
           })
           .filter(Boolean) as RoutineDay[];
         return { ...d, routine_days: days };

@@ -114,20 +114,7 @@ const ROUTINES = [
         ],
       },
       {
-        name: "Día 2 — Empuje",
-        focus: "5 ejercicios compartidos · extra de pecho y core para Daniel",
-        exercises: [
-          ["Machine_Bench_Press", 4, 6, 10, ""],
-          ["Leverage_Shoulder_Press", 3, 8, 12, ""],
-          ["Butterfly", 3, 10, 15, ""],
-          ["Side_Lateral_Raise", 3, 12, 20, ""],
-          ["Triceps_Pushdown", 2, 12, 15, ""],
-          ["Parallel_Bar_Dip", 3, 8, 12, ""],
-          ["Hanging_Leg_Raise", 3, 10, 15, ""],
-        ],
-      },
-      {
-        name: "Día 3 — Pierna A",
+        name: "Día 2 — Pierna A",
         focus: "5 ejercicios compartidos · hip thrust incluido",
         exercises: [
           ["Leg_Press", 4, 8, 12, ""],
@@ -136,6 +123,19 @@ const ROUTINES = [
           ["Leg_Extensions", 3, 12, 15, ""],
           ["Standing_Calf_Raises", 3, 12, 20, ""],
           ["Pallof_Press", 3, null, null, "30-45 s por lado. Core anti-rotación."],
+        ],
+      },
+      {
+        name: "Día 3 — Empuje",
+        focus: "5 ejercicios compartidos · extra de pecho y core para Daniel",
+        exercises: [
+          ["Leverage_Incline_Chest_Press", 4, 6, 10, "Ajusta el asiento para que las asas queden a la altura del pecho superior. No eleves los hombros."],
+          ["Leverage_Shoulder_Press", 3, 8, 12, ""],
+          ["Butterfly", 3, 10, 15, ""],
+          ["Side_Lateral_Raise", 3, 12, 20, ""],
+          ["Triceps_Pushdown", 2, 12, 15, ""],
+          ["Parallel_Bar_Dip", 3, 8, 12, ""],
+          ["Hanging_Leg_Raise", 3, 10, 15, ""],
         ],
       },
       {
@@ -172,20 +172,7 @@ const ROUTINES = [
         ],
       },
       {
-        name: "Día 2 — Empuje",
-        focus: "5 ejercicios compartidos · extra de core y movilidad para Elena",
-        exercises: [
-          ["Machine_Bench_Press", 3, 8, 12, ""],
-          ["Leverage_Shoulder_Press", 3, 10, 12, ""],
-          ["Butterfly", 3, 12, 15, ""],
-          ["Side_Lateral_Raise", 3, 12, 15, ""],
-          ["Triceps_Pushdown", 3, 12, 15, ""],
-          ["Ab_Roller", 3, null, null, "3 series. Core fuerte."],
-          [null, null, null, null, "5-10 min de movilidad de cadera y espalda."],
-        ],
-      },
-      {
-        name: "Día 3 — Pierna A",
+        name: "Día 2 — Pierna A",
         focus: "5 ejercicios compartidos · extra de glúteo para Elena",
         exercises: [
           ["Leg_Press", 3, 10, 12, ""],
@@ -194,6 +181,19 @@ const ROUTINES = [
           ["Leg_Extensions", 3, 12, 15, ""],
           ["Standing_Calf_Raises", 3, 15, 20, ""],
           ["Thigh_Abductor", 3, 15, 20, ""],
+        ],
+      },
+      {
+        name: "Día 3 — Empuje",
+        focus: "5 ejercicios compartidos · extra de core y movilidad para Elena",
+        exercises: [
+          ["Leverage_Incline_Chest_Press", 3, 8, 12, "Ajusta el asiento para que las asas queden a la altura del pecho superior. No eleves los hombros."],
+          ["Leverage_Shoulder_Press", 3, 10, 12, ""],
+          ["Butterfly", 3, 12, 15, ""],
+          ["Side_Lateral_Raise", 3, 12, 15, ""],
+          ["Triceps_Pushdown", 3, 12, 15, ""],
+          ["Ab_Roller", 3, null, null, "3 series. Core fuerte."],
+          [null, null, null, null, "5-10 min de movilidad de cadera y espalda."],
         ],
       },
       {

@@ -29,6 +29,7 @@ import {
 } from "@/lib/queries/routines";
 import { SortableExerciseItem } from "./SortableExerciseItem";
 import { ExercisePicker } from "./ExercisePicker";
+import { syncRoutineDayName } from "@/lib/routine-day-name";
 
 export function DaySection({
   routineId,
@@ -47,12 +48,17 @@ export function DaySection({
   const deleteDay = useDeleteDay();
   const addExercise = useAddExercise();
 
-  const [name, setName] = useState(day.name);
+  const [name, setName] = useState(() =>
+    syncRoutineDayName(day.name, day.position),
+  );
   const [focus, setFocus] = useState(day.focus ?? "");
   const [picker, setPicker] = useState(false);
   const [activeId, setActiveId] = useState<string | null>(null);
 
-  useEffect(() => setName(day.name), [day.name]);
+  useEffect(
+    () => setName(syncRoutineDayName(day.name, day.position)),
+    [day.name, day.position],
+  );
   useEffect(() => setFocus(day.focus ?? ""), [day.focus]);
 
   const sensors = useSensors(
@@ -83,13 +89,14 @@ export function DaySection({
       <div className="mb-4 flex items-start justify-between gap-3 border-b border-ink/20 pb-4">
         <div className="min-w-0 flex-1">
           {readOnly ? <>
-            <h2 className="font-display text-2xl font-black tracking-[-0.045em] text-ink">{day.name}</h2>
+            <h2 className="font-display text-2xl font-black tracking-[-0.045em] text-ink">{syncRoutineDayName(day.name, day.position)}</h2>
             {day.focus && <p className="mt-0.5 font-mono text-[11px] uppercase tracking-[0.1em] text-ink-mute">{day.focus}</p>}
           </> : <><input
             value={name}
             onChange={(e) => setName(e.target.value)}
             onBlur={() => {
-              const v = name.trim();
+              const v = syncRoutineDayName(name, day.position);
+              setName(v);
               if (v && v !== day.name)
                 updateDay.mutate({ routineId, dayId: day.id, name: v });
             }}
