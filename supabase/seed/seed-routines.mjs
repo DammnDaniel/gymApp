@@ -156,7 +156,7 @@ const ROUTINES = [
   {
     username: OWNER_ELLA,
     name: "Entreno · Ella",
-    description: "Fuerza completa compatible con pole. Cuatro días coordinados con Daniel, manteniendo prioridad de glúteo y core.",
+    description: "Rutina de 3 días completos más un cuarto opcional, compatible con pole y con prioridad de glúteo, pierna y core.",
     movilidadName: "Movilidad de cadera y espalda",
     days: [
       {
@@ -184,28 +184,28 @@ const ROUTINES = [
         ],
       },
       {
-        name: "Día 3 — Empuje",
-        focus: "5 ejercicios compartidos · extra de core y movilidad para Elena",
+        name: "Día 3 — Empuje y pierna B",
+        focus: "Prioridad glúteo e isquio · inicio compartido con Daniel",
         exercises: [
           ["Leverage_Incline_Chest_Press", 3, 8, 12, "Ajusta el asiento para que las asas queden a la altura del pecho superior. No eleves los hombros."],
-          ["Leverage_Shoulder_Press", 3, 10, 12, ""],
-          ["Butterfly", 3, 12, 15, ""],
-          ["Side_Lateral_Raise", 3, 12, 15, ""],
-          ["Triceps_Pushdown", 3, 12, 15, ""],
-          ["Ab_Roller", 3, null, null, "3 series. Core fuerte."],
-          [null, null, null, null, "5-10 min de movilidad de cadera y espalda."],
-        ],
-      },
-      {
-        name: "Día 4 — Espalda y pierna B",
-        focus: "4 ejercicios compartidos · extra de glúteo y core para Elena",
-        exercises: [
-          ["Seated_Cable_Rows", 3, 10, 12, ""],
-          ["Close-Grip_Front_Lat_Pulldown", 3, 10, 12, ""],
+          ["Leverage_Shoulder_Press", 2, 10, 12, ""],
           ["Single-Leg_Leg_Press", 3, 10, 12, "Por pierna. Sustituye la búlgara en Smith."],
           ["Seated_Leg_Curl", 3, 10, 15, ""],
           ["Glute_Kickback", 3, 12, 15, ""],
+          ["Triceps_Pushdown", 2, 12, 15, ""],
           ["Hanging_Leg_Raise", 3, 12, 15, ""],
+        ],
+      },
+      {
+        name: "Día 4 — Espalda, accesorios y movilidad",
+        focus: "Opcional · espalda, pecho accesorio, hombro, core y movilidad",
+        exercises: [
+          ["Seated_Cable_Rows", 3, 10, 12, ""],
+          ["Close-Grip_Front_Lat_Pulldown", 3, 10, 12, ""],
+          ["Butterfly", 2, 12, 15, ""],
+          ["Side_Lateral_Raise", 2, 12, 15, ""],
+          ["Ab_Roller", 3, null, null, "3 series. Core fuerte."],
+          [null, null, null, null, "5-10 min de movilidad de cadera y espalda."],
         ],
       },
       CARDIO_DAY,
