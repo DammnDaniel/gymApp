@@ -140,7 +140,7 @@ const ROUTINES = [
       },
       {
         name: "Día 4 — Espalda y pierna B",
-        focus: "4 ejercicios compartidos · extra de muñeca para Daniel",
+        focus: "Espalda y pierna · segundo estímulo de hombro y muñeca",
         exercises: [
           ["Seated_Cable_Rows", 3, 8, 12, ""],
           ["Close-Grip_Front_Lat_Pulldown", 3, 10, 12, "Agarre distinto al día principal."],
@@ -148,6 +148,7 @@ const ROUTINES = [
           ["Seated_Leg_Curl", 3, 10, 15, "Segundo estímulo semanal de isquios en máquina."],
           ["Palms-Up_Barbell_Wrist_Curl_Over_A_Bench", 2, 12, 20, "Flexores de muñeca."],
           ["Palms-Down_Wrist_Curl_Over_A_Bench", 2, 12, 20, "Extensores de muñeca. Usa poco peso."],
+          ["Side_Lateral_Raise", 3, 12, 20, "Segundo estímulo semanal de deltoide lateral. Hazlas en máquina o polea si está disponible; no encojas los hombros."],
         ],
       },
       CARDIO_DAY,
